@@ -11,7 +11,7 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
   
   // Fetch verses from an API
   const fetchBibleVerses = async (query) => {
-    const response = await fetch(`https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books/${book}/chapters/${chapter}/verses/${verse}.json`);
+    const response = await fetch(`https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books/${book.toLowerCase()}/chapters/${chapter}/verses/${verse}.json`);
     const data = await response.json();
     setBibleVerse(data.text);  // Adjust based on actual API structure
   };
