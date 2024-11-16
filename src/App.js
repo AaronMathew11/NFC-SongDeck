@@ -1,25 +1,51 @@
-import logo from './logo.svg';
+// App.js
 import './App.css';
+import {
+    Link,
+    Route,
+    Routes
+} from 'react-router-dom';
+import Home from './pages/home';
+import List from './pages/list';
+import Recomendation from './pages/recomendation';
+import BottomNav from './Components/bottomNav';
+import PraiseSongs from './pages/praiseSongs';
+import CoreWorship from './pages/coreWorship';
+import GenerateMessage from './pages/generateMessage'
+import { useState } from 'react';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [selectedVideos, setSelectedVideos] = useState([]);  // Store selected videos
+
+    const addVideoToList = (video) => {
+        setSelectedVideos((prevVideos) => [...prevVideos, video]);
+        console.log(selectedVideos)
+    };
+    const removeVideoFromList = (videoId) => {
+        setSelectedVideos((prevVideos) =>
+            prevVideos.filter((video) => video.youtubeId !== videoId)
+        );
+    };
+    return (
+
+        <div className="App">
+        <BottomNav/>
+            <Routes>
+                <Route path="/"
+                    element={<Home />}/>
+                    <Route path="/PraiseSongs"
+                    element={<PraiseSongs addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/>}  />
+                <Route path="/list"
+                    element={<List list={selectedVideos} removeVideoFromList={removeVideoFromList}/>} />
+                <Route path="/recomend"
+                    element={<Recomendation />} />
+                   <Route path="/CoreWorship"
+                    element={<CoreWorship addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/>} />
+                <Route path="/message-generator"
+                    element={<GenerateMessage selectedVideos={selectedVideos} />} />
+            </Routes>
+        </div>
+    );
 }
 
 export default App;
