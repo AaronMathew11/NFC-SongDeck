@@ -12,6 +12,7 @@ import BottomNav from './Components/bottomNav';
 import PraiseSongs from './pages/praiseSongs';
 import CoreWorship from './pages/coreWorship';
 import GenerateMessage from './pages/generateMessage'
+import TransitionalSongs from './pages/transitionalSongs';
 import { useState } from 'react';
 
 function App() {
@@ -41,6 +42,8 @@ function App() {
                     element={<Recomendation />} />
                    <Route path="/CoreWorship"
                     element={<CoreWorship addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/>} />
+                     <Route path="/TransitionalSongs"
+                    element={<TransitionalSongs addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/>} />
                 <Route path="/message-generator"
                     element={<GenerateMessage selectedVideos={selectedVideos} />} />
             </Routes>
