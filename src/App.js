@@ -30,7 +30,7 @@ function App() {
     return (
 
         <div className="App">
-        <BottomNav/>
+        <BottomNav />
             <Routes>
                 <Route path="/"
                     element={<Home />}/>
