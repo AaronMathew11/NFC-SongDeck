@@ -45,7 +45,7 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
   };
 
   return (
-    <div className='bg-gradient-to-b from-[#DDD5F5] to-[#FFFFFF] h-screen w-full'>
+    <div className='bg-white h-screen w-full'>
       <h1 className='font-bold pt-10 pl-5 text-left text-xl '>Please help fill in </h1><h1 className='font-bold pl-5 text-left text-xl mb-10'> the following details</h1>
       <div className='mx-5'>
         <p className='text-left font-semibold mb-2'>Theme for worship</p>
@@ -80,14 +80,14 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
         />
         </div>
       </div>
-      <button onClick={fetchBibleVerses} className="mt-8 bg-blue-500 text-white p-3 rounded text-sm">
+      <button onClick={fetchBibleVerses} className="mt-8 bg-black text-white p-4 rounded-xl text-sm">
         Generate Message
       </button>
 
       {message && (
         <div className='mt-5'>
           <h2 className='ml-5 text-left font-semibold mb-5'>Generated Message:</h2>
-          <div className='p-4 bg-white mx-5 rounded-xl'>
+          <div className='p-4 bg-white mx-5 rounded-xl shadow'>
           <pre className='w-100% break-words overflow-x-hidden mx-5 text-sm text-left '>{message}</pre>
           </div>
           <button onClick={copyToClipboard} className="mt-8 bg-green-500 text-white p-3 rounded text-sm">

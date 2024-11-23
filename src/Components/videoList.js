@@ -1,15 +1,16 @@
-import { useState } from 'react';
-import React from 'react';
-import { FaPlus } from "react-icons/fa";
+import { useState } from "react";
+import React from "react";
 
-
-function VideoList({ videos, title, addVideoToList }) {
-    const [searchQuery, setSearchQuery] = useState('');
+function VideoList({ videos, title, addVideoToList,subtitle }) {
+    const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const videosPerPage = 10; // Number of videos per page
+    const [visibleIframes, setVisibleIframes] = useState({}); // Track iframe visibility
+    const [clickedButtons, setClickedButtons] = useState({}); // Track clicked state for each button
+    const [selectedDivs, setSelectedDivs] = useState({}); // Track selected state for each div
+    const videosPerPage = 10;
 
     // Filter videos based on the search query
-    const filteredVideos = videos.filter(video =>
+    const filteredVideos = videos.filter((video) =>
         video.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -19,80 +20,112 @@ function VideoList({ videos, title, addVideoToList }) {
     const currentVideos = filteredVideos.slice(indexOfFirstVideo, indexOfLastVideo);
 
     const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
-    const [clickedButtons, setClickedButtons] = useState({}); // Track clicked state for each button
 
     const handleButtonClick = (video) => {
-        addVideoToList(video); // Add video to the list
+        addVideoToList(video);
         setClickedButtons((prevState) => ({
             ...prevState,
-            [video.youtubeId]: true, // Mark this video as clicked
+            [video.youtubeId]: true,
         }));
-        console.log(clickedButtons)
+    };
+
+    const toggleIframe = (youtubeId) => {
+        setVisibleIframes((prevState) => ({
+            ...prevState,
+            [youtubeId]: !prevState[youtubeId], // Toggle visibility
+        }));
+        setSelectedDivs((prevState) => ({
+            ...prevState,
+            [youtubeId]: !prevState[youtubeId], // Toggle selected state
+        }));
     };
 
     return (
-        <div className="pb-20"> {/* Padding bottom to ensure space for pagination */}
+        <div className="pb-24">
+            <h1 className="text-xl font-bold  text-left ml-10 pt-10 truncate mb-2">{title}</h1>
+            <p class="text-left  text-xs ml-10 mb-8">{subtitle}</p>
 
-            <h1 className="text-xl font-bold mb-4 text-left ml-5 pt-8 truncate">{title}</h1>
-            <div class="mx-5">
+            <div className="mx-5">
                 <input
                     type="text"
-                    placeholder="Search videos..."
+                    placeholder="Search Songs..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="mb-4 p-2  rounded border-2 border-gray-300 w-full"
+                    className="mb-4 p-2 rounded border-2 border-gray-300 w-full"
                 />
             </div>
 
             <div>
                 {currentVideos.map((video) => (
-                    <div key={video.youtubeId} className="flex-1 w-full mb-3 rounded-lg px-3">
-                        <iframe
-                            width="100%"
-                            height="200"
-                            src={`https://www.youtube.com/embed/${video.youtubeId}`}
-                            title={video.title}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            loading="lazy" // Lazy load the iframe
-                            className='rounded-lg'
-                        ></iframe>
-                        <div className='flex flex-row justify-between items-center mx-4 mt-2 mb-5'>
-                            <p className=" text-sm font-semibold truncate w-60 text-left">{video.title}</p>
-                            <button
-                                className={`px-4 py-2  rounded shadow ${
-                                    clickedButtons[video.youtubeId] ? 'bg-gray-400 text-white' : 'bg-white text-black'
-                                }`}
-                                onClick={() => handleButtonClick(video)}
-                                disabled={clickedButtons[video.youtubeId]} // Disable the button after it's clicked
-                            >
-                                {clickedButtons[video.youtubeId] ? (
-                                    <p className="text-sm">Added</p>
-                                ) : (
-                                    <p className="text-sm">Add to List</p>
-                                )}
-                            </button>
+                    <div className="mx-2" key={video.youtubeId}>
+                        <div
+                            className={`flex-1 w-full mb-3 rounded-lg px-3 py-4 cursor-pointer shadow ${
+                                selectedDivs[video.youtubeId] ? "bg-black" : "bg-white"
+                            }`}
+                            onClick={() => toggleIframe(video.youtubeId)} // Toggle iframe and selected state on click
+                        >
+                            {/* Conditionally render iframe */}
+                            {visibleIframes[video.youtubeId] && (
+                                <iframe
+                                    width="100%"
+                                    height="200"
+                                    src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                                    title={video.title}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    loading="lazy"
+                                    className="rounded-lg"
+                                ></iframe>
+                            )}
+                            <div className="flex flex-row justify-between items-center mx-4 mt-4 mb-3">
+                                <p
+                                    className={`text-sm truncate w-60 text-left ${
+                                        selectedDivs[video.youtubeId] ? "text-white" : "text-black"
+                                    }`}
+                                >
+                                    {video.title}
+                                </p>
+                                <button
+                                    className={`px-4 py-2 rounded-xl shadow ${
+                                        selectedDivs[video.youtubeId]
+                                            ? "bg-white text-black"
+                                            : "bg-black text-white"
+                                    }`}
+                                    onClick={(e) => {
+                                        e.stopPropagation(); // Prevent triggering iframe toggle
+                                        handleButtonClick(video);
+                                    }}
+                                    disabled={clickedButtons[video.youtubeId]}
+                                >
+                                    {clickedButtons[video.youtubeId] ? (
+                                        <p className="text-sm">Added</p>
+                                    ) : (
+                                        <p className="text-sm">Add to List</p>
+                                    )}
+                                </button>
+                            </div>
                         </div>
-
                     </div>
                 ))}
             </div>
 
             {/* Pagination Controls */}
-            <div className="mt-4 text-center">
+            <div className="mt-10 text-center">
                 <button
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+                    className="px-4 py-2 mx-2 bg-[#FFCB56] text-black rounded disabled:bg-gray-300"
                 >
                     Previous
                 </button>
-                <span className="px-4 py-2">{currentPage} / {totalPages}</span>
+                <span className="px-4 py-2">
+                    {currentPage} / {totalPages}
+                </span>
                 <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+                    className="px-4 py-2 mx-2 bg-[#FFCB56] text-black rounded disabled:bg-gray-300"
                 >
                     Next
                 </button>

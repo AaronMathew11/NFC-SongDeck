@@ -83,8 +83,8 @@ const transitionalSongs = ({addVideoToList, removeVideoFromList}) => {
   
   ];
   return( 
-    <div class="bg-gradient-to-b from-[#DDD5F5] to-[#FFFFFF] h-screen w-full">
-  <VideoList videos={transitionSongs} title="Transitional Songs" addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+    <div class="bg-white h-screen w-full">
+  <VideoList videos={transitionSongs} title="Transitional Songs" subtitle="Songs that bridge the energy of praise and the depth of worship." addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
 };
 
 export default transitionalSongs;

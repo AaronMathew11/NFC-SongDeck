@@ -91,8 +91,8 @@ const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
       youtubeId: 's4CRvAPzxjI'
     }
   ]
-  return ( <div class="bg-gradient-to-b from-[#DDD5F5] to-[#FFFFFF] h-screen w-full">
- <VideoList videos={worshipSongs} title="Worship songs" addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+  return ( <div class="bg-white h-screen w-full">
+ <VideoList videos={worshipSongs} title="Worship songs" subtitle="Core worship songs to deepen intimacy and reverence for God." addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
 };
 
 export default CoreWorship;

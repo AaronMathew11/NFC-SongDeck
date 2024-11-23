@@ -82,8 +82,8 @@ const PraiseSongs = ({addVideoToList, removeVideoFromList}) => {
   
   ];
   return( 
-    <div class="bg-gradient-to-b from-[#DDD5F5] to-[#FFFFFF] h-screen w-full">
-  <VideoList videos={praiseSongs} title="Praise songs" addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+    <div class="bg-white h-screen w-full">
+  <VideoList videos={praiseSongs} title="Praise songs" subtitle="Praise songs to lead the church in glorifying God’s name!" addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
 };
 
 export default PraiseSongs;
