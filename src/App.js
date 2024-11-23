@@ -14,8 +14,11 @@ import CoreWorship from './pages/coreWorship';
 import GenerateMessage from './pages/generateMessage'
 import TransitionalSongs from './pages/transitionalSongs';
 import { useState } from 'react';
+import Roster from './pages/roster';
+import Songs from './pages/songs';
 
 function App() {
+    
     const [selectedVideos, setSelectedVideos] = useState([]);  // Store selected videos
 
     const addVideoToList = (video) => {
@@ -46,6 +49,10 @@ function App() {
                     element={<TransitionalSongs addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/>} />
                 <Route path="/message-generator"
                     element={<GenerateMessage selectedVideos={selectedVideos} />} />
+                <Route path="/Roster"
+                    element={<Roster />} />
+                <Route path="/WeeklySongs"
+                    element={<Songs />} />
             </Routes>
         </div>
     );

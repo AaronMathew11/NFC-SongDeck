@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaList, FaExchangeAlt } from 'react-icons/fa';
+import { FaHome, FaList, FaRegEdit } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 
 const BottomNav = () => {
@@ -13,9 +13,9 @@ const BottomNav = () => {
         <FaList className="text-[16px] text-black"/>
         <span className="block mt-1 text-black text-[12px]">List</span>
       </NavLink>
-      <NavLink to="/recomend" className=" flex flex-col  items-center" >
-        <FaExchangeAlt className="text-[16px] text-black"/>
-        <span className="block mt-1 text-black text-[12px]">recommend</span>
+      <NavLink to="/roster" className=" flex flex-col  items-center" >
+        <FaRegEdit className="text-[16px] text-black"/>
+        <span className="block mt-1 text-black text-[12px]">Roster</span>
       </NavLink>
     </nav>
   );
