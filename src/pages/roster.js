@@ -23,10 +23,23 @@ const Roster = ({ list, removeVideoFromList }) => {
   });
 
   useEffect(() => {
-    async function fetchRoster() {
+    const fetchRoster = async () => {
+      const cacheExpiryTime = 3600 * 1000; // 1 hour in milliseconds
+      const cachedRoster = localStorage.getItem("roster");
+      const cachedTimestamp = localStorage.getItem("rosterTimestamp");
+
+      const isCacheValid =
+        cachedRoster && cachedTimestamp && Date.now() - cachedTimestamp < cacheExpiryTime;
+
+      if (isCacheValid) {
+        setRoster(JSON.parse(cachedRoster)); // Use cached data
+        setLoading(false); // Data is already loaded
+        return;
+      }
+
       try {
         const response = await fetch("https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster", {
-          method: "get",
+          method: "GET",
           headers: new Headers({
             "ngrok-skip-browser-warning": "69420",
           }),
@@ -38,19 +51,26 @@ const Roster = ({ list, removeVideoFromList }) => {
 
         const data = await response.json();
         setRoster(data.data);
+
+        // Cache the roster data and the timestamp
+        localStorage.setItem("roster", JSON.stringify(data.data));
+        localStorage.setItem("rosterTimestamp", Date.now());
       } catch (error) {
         console.error("Error fetching roster:", error.message);
       } finally {
         setLoading(false);
       }
-    }
+    };
+
     fetchRoster();
   }, []);
 
   return (
     <div className="bg-gray-50 min-h-screen w-full">
       <h1 className="text-3xl font-bold pt-8 pl-10 text-left text-black">Roster</h1>
-      <p class="text-xs mt-2 text-left mb-6 pl-10">View roles and responsibilites with ease</p>
+      <p className="text-xs mt-2 text-left mb-6 pl-10">
+        View roles and responsibilities with ease
+      </p>
 
       <div className="px-8">
         <input
