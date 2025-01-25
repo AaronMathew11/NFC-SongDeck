@@ -59,7 +59,7 @@ const List = ({ list, removeVideoFromList }) => {
               className="flex flex-row justify-between items-center mb-3 mx-10"
             >
               <p className="text-left text-sm truncate">
-                {index}. {song.title}
+                {index+1}. {song.title}
               </p>
               <button
                 onClick={() => removeVideoFromList(song.youtubeId)}
