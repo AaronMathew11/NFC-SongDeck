@@ -12,13 +12,12 @@ const Roster = ({ list, removeVideoFromList }) => {
       formattedDate.isAfter(moment()) && // Filter dates after today
       (
         day.Date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Worship Lead/ PPT"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Acoustic Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Bass Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+        day["Lead/ Lyrics/ Posting"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+        day["Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+        day["Bass"].toLowerCase().includes(searchQuery.toLowerCase()) ||
         day["Keyboard"].toLowerCase().includes(searchQuery.toLowerCase()) ||
         day["Drums"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Song Posting"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Back-up Singers"].toLowerCase().includes(searchQuery.toLowerCase())
+        day["Supporting Vocals"].toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
   });
