@@ -11,7 +11,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (<div class="bg-white">
-        <div class="pt-10 place-items-start ml-10">  <h1 class="text-black text-2xl font-bold">NFC SongDeck</h1>
+        <div class="pt-8 place-items-start ml-10">  <h1 class="text-black text-2xl font-bold">NFC SongDeck</h1>
         <p class="text-xs mt-2">A single place for all things worship</p>
         </div>
         <img src={homeImage} className='h-90 mt-8'/>
@@ -21,7 +21,7 @@ const Home = () => {
         </div> */}
 <div className='px-7 mt-3'>
     <div class="flex flex-col place-items-start  py-4 mb-3 px-8 bg-white shadow rounded-lg" onClick={() => navigate("/PraiseSongs")}>
-    <h2 class="text-black mb-3 font-semibold">Praise Songs</h2>
+    <h2 class="text-black mb-3 font-bold">Praise Songs</h2>
     <div class="flex flex-row">
       {/* <img src={praiseImage} class="rounded-lg h-16 w-16"></img> */}
     <span class="text-left  text-xs">Praise songs to lead the church in glorifying God’s name!</span>
