@@ -80,13 +80,13 @@ const Roster = ({ list, removeVideoFromList }) => {
               <p className="text-left text-lg truncate font-bold text-black">{day.Date}</p>
               <div className="mt-4">
                 <p className="text-left text-sm truncate">
-                  <span className="font-semibold">Lead:</span> {day["Worship Lead/ PPT"]}
+                  <span className="font-semibold">Lead:</span> {day["Lead/ Lyrics/ Posting"]}
                 </p>
                 <p className="text-left text-sm truncate mt-1">
-                  <span className="font-semibold">Acoustic:</span> {day["Acoustic Guitar"]}
+                  <span className="font-semibold">Acoustic:</span> {day["Guitar"]}
                 </p>
                 <p className="text-left text-sm truncate mt-1">
-                  <span className="font-semibold">Bass:</span> {day["Bass Guitar"]}
+                  <span className="font-semibold">Bass:</span> {day["Bass"]}
                 </p>
                 <p className="text-left text-sm truncate mt-1">
                   <span className="font-semibold">Keyboard:</span> {day["Keyboard"]}
@@ -95,10 +95,7 @@ const Roster = ({ list, removeVideoFromList }) => {
                   <span className="font-semibold">Drums:</span> {day["Drums"]}
                 </p>
                 <p className="text-left text-sm truncate mt-1">
-                  <span className="font-semibold">Back-up Singers:</span> {day["Back-up Singers"]}
-                </p>
-                <p className="text-left text-sm truncate mt-1">
-                  <span className="font-semibold">Song Posting:</span> {day["Song Posting"]}
+                  <span className="font-semibold">Back-up Singers:</span> {day["Supporting Vocals"]}
                 </p>
               </div>
             </div>
