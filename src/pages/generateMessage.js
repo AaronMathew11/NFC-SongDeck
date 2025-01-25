@@ -38,7 +38,7 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
     generatedMessage += `${book} ${chapter}:${verse} ${bibleVerse}\n\n`;
 
     selectedVideos.forEach((song, index) => {
-      generatedMessage += `Song ${index} - ${song.title} - https://www.youtube.com/watch?v=${song.youtubeId}\n`;
+      generatedMessage += `Song ${index+1} - ${song.title} - https://www.youtube.com/watch?v=${song.youtubeId}\n`;
     });
 
     setMessage(generatedMessage);
