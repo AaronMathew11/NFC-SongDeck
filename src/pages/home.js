@@ -30,7 +30,7 @@ const Home = () => {
       </div>
       <div className='px-7'>
       <div class="flex flex-col place-items-start py-4  pb-3 mb-4 px-8 bg-white shadow rounded-lg" onClick={() => navigate("/TransitionalSongs")}>
-    <h2 class="text-black mb-3 font-semibold">Transitional Songs</h2>
+    <h2 class="text-black mb-3 font-bold">Transitional Songs</h2>
     <div class="flex flex-row">
     {/* <img src={transitionalImage} class="rounded-lg h-16 w-16"></img> */}
     <span class="text-left  text-xs">Songs that bridge the energy of praise and the depth of worship.</span>
@@ -41,7 +41,7 @@ const Home = () => {
       <div className='px-7'>
 
       <div class="flex flex-col place-items-start mt-5 py-3 mb-4 px-8 bg-white shadow rounded-lg" onClick={() => navigate("/CoreWorship")}>
-    <h2 class="text-black mb-3 font-semibold">Core Worship</h2>
+    <h2 class="text-black mb-3 font-bold">Core Worship</h2>
     <div class="flex flex-row">
     {/* <img src={worshipImage} class="rounded-lg h-16 w-16"></img> */}
     <span class="text-left  text-xs">Core worship songs to deepen intimacy and reverence for God.</span>
