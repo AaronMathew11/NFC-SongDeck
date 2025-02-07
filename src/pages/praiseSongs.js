@@ -78,6 +78,8 @@ const PraiseSongs = ({addVideoToList, removeVideoFromList}) => {
       { title: 'Yeshua is Lord', youtubeId: '4slU_JjdhrU' },
       { title: 'You Are Good', youtubeId: 'Qk6Py5RW2AY' },
       { title: 'Your Grace is Enough', youtubeId: 'd7dW6d2-6B0' },
+      { title: 'Every Praise', youtubeId: 'VlJIMgh6Oec' },
+      { title: 'Trading my sorrows', youtubeId: '2KsfwvpcQhY' },
       
   
   ];
