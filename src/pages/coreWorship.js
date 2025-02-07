@@ -89,7 +89,13 @@ const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
     {
       title: 'For Your name is holy - Paul Wilbur',
       youtubeId: 's4CRvAPzxjI'
+    },
+    {
+      title: 'Breath',
+      youtubeId: 'KqNeIqvpdjw'
     }
+
+    
   ]
   return ( <div class="bg-white h-screen w-full">
  <VideoList videos={worshipSongs} title="Worship songs" subtitle="Core worship songs to deepen intimacy and reverence for God." addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
