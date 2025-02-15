@@ -79,7 +79,25 @@ const transitionalSongs = ({addVideoToList, removeVideoFromList}) => {
       {
         title: 'Your Love is Amazing Steady and Unchanging',
         youtubeId: 'pWT3Hd6WqE0'
+      },
+      {
+        title: 'You are worthy of my praise',
+        youtubeId: 'bktcek7iNvE'
+      },
+      {
+        title: 'Touch of Heaven',
+        youtubeId: 'sWwHBZm3HIA'
+      },
+      {
+        title: 'Give us your heart',
+        youtubeId: 'gLYV43SBARg'
+      },
+      {
+        title: 'Easy',
+        youtubeId: 'sa93t5kmoUQ'
       }
+
+      
   
   ];
   return( 

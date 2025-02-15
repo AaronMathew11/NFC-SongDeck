@@ -93,7 +93,25 @@ const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
     {
       title: 'Breath',
       youtubeId: 'KqNeIqvpdjw'
+    },
+    {
+      title: 'What love, my God',
+      youtubeId: 'CjXK9PdCpis'
+    },
+    {
+      title: 'Oh The Cross',
+      youtubeId: 'HyR_Pnggv_A'
+    },
+    {
+      title: 'Boldly I Approach',
+      youtubeId: 'Xx94Fg4qZr8'
+    },
+    {
+      title: 'When Wind Meets Fire',
+      youtubeId: '7Q5d6zvf8Q'
     }
+
+    
 
     
   ]
