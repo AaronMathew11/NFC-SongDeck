@@ -109,7 +109,11 @@ const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
     {
       title: 'When Wind Meets Fire',
       youtubeId: '7Q5d6zvf8Q'
-    }
+    },
+      {
+        title: 'Been So Good',
+        youtubeId: 'D3yMC_qoAes'
+      }
 
     
 
