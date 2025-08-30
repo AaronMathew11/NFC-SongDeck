@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import VideoList from '../Components/videoList';
 
 const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
@@ -119,8 +118,15 @@ const CoreWorship = ({addVideoToList, removeVideoFromList}) => {
 
     
   ]
-  return ( <div class="bg-white h-screen w-full">
- <VideoList videos={worshipSongs} title="Worship songs" subtitle="Core worship songs to deepen intimacy and reverence for God." addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+  return (
+    <VideoList 
+      videos={worshipSongs} 
+      title="Core Worship" 
+      subtitle="Intimate songs for deeper reverence and intimacy with God" 
+      addVideoToList={addVideoToList} 
+      removeVideoFromList={removeVideoFromList}
+    />
+  )
 };
 
 export default CoreWorship;

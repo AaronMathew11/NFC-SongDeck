@@ -4,19 +4,61 @@ import { NavLink } from 'react-router-dom';
 
 const BottomNav = () => {
   return (
-    <nav class="fixed bottom-0 left-0 w-full h-[60px] bg-black flex justify-around items-center border-t border-gray-300 z-1000 no-border rounded-t-3xl">
-      <NavLink to="/" className=" flex flex-col  items-center">
-        <FaHome className="text-[16px] text-white"/>
-        <span className="block mt-1 text-white text-[12px]">Home</span>
-      </NavLink>
-      <NavLink to="/list" className=" flex flex-col items-center " >
-        <FaList className="text-[16px] text-white"/>
-        <span className="block mt-1 text-white text-[12px]">List</span>
-      </NavLink>
-      <NavLink to="/roster" className=" flex flex-col  items-center" >
-        <FaRegEdit className="text-[16px] text-white"/>
-        <span className="block mt-1 text-white text-[12px]">Roster</span>
-      </NavLink>
+    <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+      <div className="bg-gray-900 rounded-full px-8 py-4 shadow-lg">
+        <div className="flex items-center space-x-12">
+          <NavLink 
+            to="/" 
+            className={({ isActive }) =>
+              `flex items-center justify-center transition-all duration-200 ${
+                isActive 
+                  ? "w-10 h-10 bg-white rounded-full" 
+                  : "w-8 h-8"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <FaHome className={`text-lg transition-colors duration-200 ${
+                isActive ? "text-gray-900" : "text-white"
+              }`} />
+            )}
+          </NavLink>
+          
+          <NavLink 
+            to="/list" 
+            className={({ isActive }) =>
+              `flex items-center justify-center transition-all duration-200 ${
+                isActive 
+                  ? "w-10 h-10 bg-white rounded-full" 
+                  : "w-8 h-8"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <FaList className={`text-lg transition-colors duration-200 ${
+                isActive ? "text-gray-900" : "text-white"
+              }`} />
+            )}
+          </NavLink>
+          
+          <NavLink 
+            to="/roster" 
+            className={({ isActive }) =>
+              `flex items-center justify-center transition-all duration-200 ${
+                isActive 
+                  ? "w-10 h-10 bg-white rounded-full" 
+                  : "w-8 h-8"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <FaRegEdit className={`text-lg transition-colors duration-200 ${
+                isActive ? "text-gray-900" : "text-white"
+              }`} />
+            )}
+          </NavLink>
+        </div>
+      </div>
     </nav>
   );
 };

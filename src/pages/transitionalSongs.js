@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import VideoList from '../Components/videoList';
 
 const transitionalSongs = ({addVideoToList, removeVideoFromList}) => {
@@ -100,9 +99,15 @@ const transitionalSongs = ({addVideoToList, removeVideoFromList}) => {
       
   
   ];
-  return( 
-    <div class="bg-white h-screen w-full">
-  <VideoList videos={transitionSongs} title="Transitional Songs" subtitle="Songs that bridge the energy of praise and the depth of worship." addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+  return (
+    <VideoList 
+      videos={transitionSongs} 
+      title="Transitional Songs" 
+      subtitle="Songs that bridge the energy of praise and the depth of worship" 
+      addVideoToList={addVideoToList} 
+      removeVideoFromList={removeVideoFromList}
+    />
+  )
 };
 
 export default transitionalSongs;

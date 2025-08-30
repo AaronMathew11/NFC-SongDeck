@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import VideoList from '../Components/videoList';
 
 const PraiseSongs = ({addVideoToList, removeVideoFromList}) => {
@@ -95,9 +94,15 @@ const PraiseSongs = ({addVideoToList, removeVideoFromList}) => {
       
   
   ];
-  return( 
-    <div class="bg-white h-screen w-full">
-  <VideoList videos={praiseSongs} title="Praise songs" subtitle="Praise songs to lead the church in glorifying God’s name!" addVideoToList={addVideoToList} removeVideoFromList={removeVideoFromList}/></div>)
+  return (
+    <VideoList 
+      videos={praiseSongs} 
+      title="Praise Songs" 
+      subtitle="Uplifting songs to glorify God's name" 
+      addVideoToList={addVideoToList} 
+      removeVideoFromList={removeVideoFromList}
+    />
+  )
 };
 
 export default PraiseSongs;
