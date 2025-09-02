@@ -7,6 +7,9 @@ const Roster = ({ list, removeVideoFromList }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [copiedDays, setCopiedDays] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({});
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const filteredDays = roster.filter((day) => {
     const formattedDate = moment(day.Date, "Do MMMM YYYY");
@@ -24,47 +27,49 @@ const Roster = ({ list, removeVideoFromList }) => {
     );
   }).sort((a, b) => moment(a.Date, "Do MMMM YYYY").valueOf() - moment(b.Date, "Do MMMM YYYY").valueOf());
 
-  useEffect(() => {
-    const fetchRoster = async () => {
-      const cacheExpiryTime = 3600 * 1000;
-      const cachedRoster = localStorage.getItem("roster");
-      const cachedTimestamp = localStorage.getItem("rosterTimestamp");
+  const fetchRoster = async (page = 1, append = false) => {
+    try {
+      if (!append) setLoading(true);
+      else setLoadingMore(true);
+      
+      const response = await fetch(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster?page=${page}&limit=10`, {
+        method: "GET",
+        headers: new Headers({
+          "ngrok-skip-browser-warning": "69420",
+        }),
+      });
 
-      const isCacheValid =
-        cachedRoster && cachedTimestamp && Date.now() - cachedTimestamp < cacheExpiryTime;
-
-      if (isCacheValid) {
-        setRoster(JSON.parse(cachedRoster));
-        setLoading(false);
-        return;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      try {
-        const response = await fetch("https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster", {
-          method: "GET",
-          headers: new Headers({
-            "ngrok-skip-browser-warning": "69420",
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
+      const data = await response.json();
+      
+      if (append) {
+        setRoster(prev => [...prev, ...data.data]);
+      } else {
         setRoster(data.data);
-
-        localStorage.setItem("roster", JSON.stringify(data.data));
-        localStorage.setItem("rosterTimestamp", Date.now());
-      } catch (error) {
-        console.error("Error fetching roster:", error.message);
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      setPagination(data.pagination);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error("Error fetching roster:", error.message);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
-    fetchRoster();
+  useEffect(() => {
+    fetchRoster(1);
   }, []);
+
+  const loadMore = () => {
+    if (currentPage < pagination.pages && !loadingMore) {
+      fetchRoster(currentPage + 1, true);
+    }
+  };
 
   const getRoleIcon = (role) => {
     const iconClass = "text-sm";
@@ -212,6 +217,21 @@ const Roster = ({ list, removeVideoFromList }) => {
               </div>
             </div>
           ))}
+          
+          {/* Load More Button */}
+          {pagination.pages > currentPage && (
+            <div className="text-center mt-6">
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className={`bg-gray-900 text-white px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                  loadingMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
+                }`}
+              >
+                {loadingMore ? 'Loading...' : `Load More (${pagination.total - roster.length} remaining)`}
+              </button>
+            </div>
+          )}
         </div>
       )}
       </div>

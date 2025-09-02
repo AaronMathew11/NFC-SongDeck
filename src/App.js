@@ -14,7 +14,6 @@ import CoreWorship from './pages/coreWorship';
 import GenerateMessage from './pages/generateMessage'
 import TransitionalSongs from './pages/transitionalSongs';
 import Login from './pages/login';
-import Register from './pages/register';
 import QuietTime from './pages/quietTime';
 import { useState, useEffect } from 'react';
 import Roster from './pages/roster';
@@ -76,7 +75,6 @@ const AppContent = () => {
             {isAuthenticated && <BottomNav />}
             <Routes>
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
                 
                 <Route path="/" element={
                     <ProtectedRoute>
