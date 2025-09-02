@@ -78,19 +78,23 @@ const List = ({ list, removeVideoFromList, reorderSongs }) => {
   };
 
   return (
-    <div className="page-container max-w-md mx-auto">
-      {/* Header Section */}
-      <div className="text-center pt-6 pb-4 animate-fade-in">
-        <div className="flex items-center justify-center space-x-3 mb-3">
-          <h1 className="section-header">My Worship List</h1>
+    <div className="min-h-screen pb-24 bg-gray-50">
+      {/* Dark Header Section */}
+      <div className="bg-gray-900 text-white">
+        <div className="max-w-md mx-auto px-4">
+          <div className="text-center pt-6 pb-4 animate-fade-in">
+            <h1 className="text-lg font-bold text-white mb-2">My Worship List</h1>
+            <p className="text-gray-300 text-xs max-w-sm mx-auto leading-relaxed">
+              Curate your perfect worship experience
+            </p>
+          </div>
         </div>
-        <p className="text-gray-500 text-xs max-w-xs mx-auto leading-relaxed">
-          Curate your perfect worship experience
-        </p>
       </div>
 
+      <div className="max-w-md mx-auto px-4">
+
       {/* Hero Image */}
-      <div className="flex justify-center mb-6 animate-slide-up">
+      <div className="flex justify-center mb-6 animate-slide-up pt-6">
         {cachedImage ? (
           <div className="relative">
             <img 
@@ -180,6 +184,7 @@ const List = ({ list, removeVideoFromList, reorderSongs }) => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

@@ -1,33 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaMusic, FaHeart, FaStar, FaCalendarWeek } from "react-icons/fa";
+import { FaMusic, FaHeart, FaStar, FaCalendarWeek, FaSignOutAlt } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 import moment from "moment";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { logout, user } = useAuth();
   
   const getCurrentDate = () => {
     return moment().format('DD MMM');
   };
   
-  const getNextSunday = () => {
-    const today = moment();
-    const nextSunday = today.clone().day(7);
-    if (today.day() === 0) {
-      nextSunday.add(7, 'days');
-    }
-    return nextSunday.format('DD MMM');
-  };
-  
-  const getDaysUntilSunday = () => {
-    const today = moment();
-    const nextSunday = today.clone().day(7);
-    if (today.day() === 0) {
-      nextSunday.add(7, 'days');
-    }
-    const daysLeft = nextSunday.diff(today, 'days');
-    return daysLeft;
-  };
 
   const songCategories = [
     {
@@ -60,46 +44,28 @@ const Home = () => {
   ];
 
   return (
-    <div className="page-container">
-      {/* Header */}
-      <div className="pt-8 pb-6">
-        <div className="flex items-center justify-between">
-          <div className="text-left">
-            <h1 className="text-xl font-bold text-gray-900">Hello, Worship Team</h1>
-            <p className="text-gray-500 text-xs mt-2">Today {getCurrentDate()}</p>
-          </div>
-          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-            <FaMusic className="text-gray-600 text-lg" />
-          </div>
-        </div>
-      </div>
-
-      {/* Daily Challenge Card - Featured Card */}
-      <div className="mb-8">
-        <div className="bg-accent-yellow rounded-3xl p-6 relative overflow-hidden">
-          <div className="relative z-10">
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Weekly Planning</h2>
-            <p className="text-gray-700 text-xs mb-4">Next Sunday {getNextSunday()} • {getDaysUntilSunday()} days left</p>
-            <div className="flex items-center space-x-2">
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 bg-gray-800 rounded-full border-2 border-white flex items-center justify-center">
-                  <FaMusic className="text-white text-xs" />
-                </div>
-                <div className="w-8 h-8 bg-primary rounded-full border-2 border-white flex items-center justify-center">
-                  <FaHeart className="text-white text-xs" />
-                </div>
-                <div className="w-8 h-8 bg-accent-green rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold">+</div>
-              </div>
+    <>
+      
+      <div className="page-container">
+        {/* Header */}
+        <div className="pt-8 pb-6">
+          <div className="flex items-center justify-between">
+            <div className="text-left">
+              <h1 className="text-xl font-bold text-gray-900">Hello, {user?.name || 'Worship Team'}</h1>
+              <p className="text-gray-500 text-xs mt-2">Today {getCurrentDate()}</p>
             </div>
-          </div>
-          <div className="absolute right-4 top-4 opacity-20">
-            <FaCalendarWeek className="text-6xl text-gray-800" />
+            <button 
+              onClick={logout}
+              className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors duration-200"
+            >
+              <FaSignOutAlt className="text-gray-600 text-lg" />
+            </button>
           </div>
         </div>
-      </div>
+
 
       {/* Week Calendar */}
-      <div className="mb-8">
+      <div className="mb-12">
         <div className="flex justify-between">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
             const currentDate = moment().startOf('week').add(index, 'days');
@@ -122,9 +88,9 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Your Plan Section */}
-      <div className="mb-8">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Your worship plan</h3>
+      {/* Song Selection Section */}
+      <div className="my-16">
+        <h3 className="text-lg font-bold text-gray-900 mb-6 text-left">Select songs for your list</h3>
         <div className="grid grid-cols-2 gap-3">
           {songCategories.map((category, index) => (
             <div
@@ -155,7 +121,9 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
+
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaList, FaRegEdit } from 'react-icons/fa';
+import { FaHome, FaList, FaRegEdit, FaBook } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 
 const BottomNav = () => {
@@ -36,6 +36,23 @@ const BottomNav = () => {
           >
             {({ isActive }) => (
               <FaList className={`text-lg transition-colors duration-200 ${
+                isActive ? "text-gray-900" : "text-white"
+              }`} />
+            )}
+          </NavLink>
+          
+          <NavLink 
+            to="/quiet-time" 
+            className={({ isActive }) =>
+              `flex items-center justify-center transition-all duration-200 ${
+                isActive 
+                  ? "w-10 h-10 bg-white rounded-full" 
+                  : "w-8 h-8"
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <FaBook className={`text-lg transition-colors duration-200 ${
                 isActive ? "text-gray-900" : "text-white"
               }`} />
             )}

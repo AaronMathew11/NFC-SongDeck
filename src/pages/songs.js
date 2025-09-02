@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaMusic, FaExternalLinkAlt, FaCalendarWeek } from "react-icons/fa";
+import { FaMusic, FaExternalLinkAlt } from "react-icons/fa";
+import LogoutButton from "../Components/LogoutButton";
 import songImage from "../images/songsImage.png";
 
 const Songs = () => {
@@ -79,16 +80,18 @@ const Songs = () => {
   }, []);
 
   return (
-    <div className="page-container">
-      {/* Header */}
-      <div className="text-center pt-8 pb-6 animate-fade-in">
-        <div className="flex items-center justify-center space-x-3 mb-3">
-          <h1 className="section-header">This Week's Songs</h1>
+    <>
+      
+      <div className="page-container">
+        {/* Header */}
+        <div className="text-center pt-8 pb-6 animate-fade-in">
+          <div className="flex items-center justify-center space-x-3 mb-3">
+            <h1 className="section-header">This Week's Songs</h1>
+          </div>
+          <p className="text-gray-500 text-sm max-w-sm mx-auto">
+            Access chord sheets for upcoming Sunday worship
+          </p>
         </div>
-        <p className="text-gray-500 text-sm max-w-sm mx-auto">
-          Access chord sheets for upcoming Sunday worship
-        </p>
-      </div>
 
       {/* Hero Image */}
       <div className="flex justify-center mb-8 animate-slide-up">
@@ -159,7 +162,8 @@ const Songs = () => {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

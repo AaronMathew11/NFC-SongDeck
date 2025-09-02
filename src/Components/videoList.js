@@ -2,12 +2,10 @@ import { useState } from "react";
 import React from "react";
 import { FaPlay, FaCheck, FaPlus, FaSearch } from "react-icons/fa";
 
-function VideoList({ videos, title, addVideoToList, subtitle }) {
+function VideoList({ videos, title, addVideoToList, subtitle, selectedVideos = [] }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [visibleIframes, setVisibleIframes] = useState({});
-    const [clickedButtons, setClickedButtons] = useState({});
-    const [selectedDivs, setSelectedDivs] = useState({});
     const videosPerPage = 8;
 
     const filteredVideos = videos.filter((video) =>
@@ -21,18 +19,10 @@ function VideoList({ videos, title, addVideoToList, subtitle }) {
 
     const handleButtonClick = (video) => {
         addVideoToList(video);
-        setClickedButtons((prevState) => ({
-            ...prevState,
-            [video.youtubeId]: true,
-        }));
     };
 
     const toggleIframe = (youtubeId) => {
         setVisibleIframes((prevState) => ({
-            ...prevState,
-            [youtubeId]: !prevState[youtubeId],
-        }));
-        setSelectedDivs((prevState) => ({
             ...prevState,
             [youtubeId]: !prevState[youtubeId],
         }));
@@ -77,8 +67,8 @@ function VideoList({ videos, title, addVideoToList, subtitle }) {
                     >
                         <div
                             className={`group relative transition-all duration-200 cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-md ${
-                                selectedDivs[video.youtubeId] 
-                                    ? "border-2 border-gray-900" 
+                                selectedVideos.some(v => v.youtubeId === video.youtubeId)
+                                    ? "border-2 border-green-500" 
                                     : "border border-gray-200"
                             }`}
                             onClick={() => toggleIframe(video.youtubeId)}
@@ -104,12 +94,12 @@ function VideoList({ videos, title, addVideoToList, subtitle }) {
                             <div className="flex items-center justify-between px-4 py-3">
                                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                                        selectedDivs[video.youtubeId] 
-                                            ? "bg-gray-900" 
+                                        selectedVideos.some(v => v.youtubeId === video.youtubeId)
+                                            ? "bg-green-500" 
                                             : "bg-gray-100"
                                     }`}>
                                         <FaPlay className={`text-xs ${
-                                            selectedDivs[video.youtubeId] 
+                                            selectedVideos.some(v => v.youtubeId === video.youtubeId)
                                                 ? "text-white" 
                                                 : "text-gray-500"
                                         }`} />
@@ -123,7 +113,7 @@ function VideoList({ videos, title, addVideoToList, subtitle }) {
                                 
                                 <button
                                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-200 ${
-                                        clickedButtons[video.youtubeId]
+                                        selectedVideos.some(v => v.youtubeId === video.youtubeId)
                                             ? "bg-green-500 text-white"
                                             : "bg-gray-900 hover:bg-gray-800 text-white"
                                     }`}
@@ -131,9 +121,8 @@ function VideoList({ videos, title, addVideoToList, subtitle }) {
                                         e.stopPropagation();
                                         handleButtonClick(video);
                                     }}
-                                    disabled={clickedButtons[video.youtubeId]}
                                 >
-                                    {clickedButtons[video.youtubeId] ? (
+                                    {selectedVideos.some(v => v.youtubeId === video.youtubeId) ? (
                                         <FaCheck className="text-xs" />
                                     ) : (
                                         <FaPlus className="text-xs" />
