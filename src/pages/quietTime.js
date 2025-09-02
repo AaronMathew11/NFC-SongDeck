@@ -453,7 +453,6 @@ const QuietTime = () => {
                             </div>
                             <div>
                               <h4 className="font-medium text-gray-900">{mentee.name}</h4>
-                              <p className="text-sm text-gray-500">{mentee.email}</p>
                             </div>
                           </div>
                           <div className="text-right">
@@ -480,7 +479,6 @@ const QuietTime = () => {
                         </div>
                         <div>
                           <h3 className="text-lg font-bold text-gray-900">{selectedMentee.name}'s Notes</h3>
-                          <p className="text-sm text-gray-500">{selectedMentee.email}</p>
                         </div>
                       </div>
                       <button
