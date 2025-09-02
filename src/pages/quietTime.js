@@ -86,22 +86,33 @@ const QuietTime = () => {
     }
   };
 
-  const compressImage = (file, maxWidth = 1200, quality = 0.8) => {
-    return new Promise((resolve) => {
+  const compressImage = (file, maxWidth = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
       
       img.onload = () => {
-        const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-        canvas.width = img.width * ratio;
-        canvas.height = img.height * ratio;
-        
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        canvas.toBlob(resolve, 'image/jpeg', quality);
+        try {
+          const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+          canvas.width = img.width * ratio;
+          canvas.height = img.height * ratio;
+          
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Failed to compress image'));
+            }
+          }, 'image/jpeg', quality);
+        } catch (error) {
+          reject(error);
+        }
       };
       
+      img.onerror = () => reject(new Error('Failed to load image'));
       img.src = URL.createObjectURL(file);
     });
   };
@@ -110,19 +121,26 @@ const QuietTime = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    let processedFile = file;
-    
-    if (file.size > 2 * 1024 * 1024) {
-      processedFile = await compressImage(file);
-    }
+    try {
+      let processedFile = file;
+      
+      if (file.size > 2 * 1024 * 1024) {
+        setSubmitFeedback('Compressing image...');
+        processedFile = await compressImage(file);
+        setSubmitFeedback('');
+      }
 
-    setSelectedImage(processedFile);
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
-    };
-    reader.readAsDataURL(processedFile);
+      setSelectedImage(processedFile);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(processedFile);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      setSubmitFeedback('❌ Error processing image. Please try a different photo.');
+    }
   };
 
   const handleSubmit = async () => {
@@ -285,7 +303,8 @@ const QuietTime = () => {
                   <p className="text-gray-600 mb-6 text-sm">Click to upload a photo of your quiet time notes</p>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,image/heic,image/heif"
+                    capture="environment"
                     onChange={handleImageSelect}
                     className="hidden"
                     id="image-upload"
