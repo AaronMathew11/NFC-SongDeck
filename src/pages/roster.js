@@ -27,7 +27,19 @@ const Roster = ({ list, removeVideoFromList }) => {
         )
       );
     })
-    .sort((a, b) => moment(a.Date, "Do MMMM YYYY") - moment(b.Date, "Do MMMM YYYY"));
+    .sort((a, b) => {
+      const dateA = moment(a.Date, "Do MMMM YYYY");
+      const dateB = moment(b.Date, "Do MMMM YYYY");
+      
+      // Prioritize Sundays first, then sort by date
+      const isSundayA = dateA.day() === 0;
+      const isSundayB = dateB.day() === 0;
+      
+      if (isSundayA && !isSundayB) return -1;
+      if (!isSundayA && isSundayB) return 1;
+      
+      return dateA - dateB;
+    });
 
   const fetchRoster = async (page = 1, append = false) => {
     try {
