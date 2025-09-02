@@ -25,7 +25,7 @@ const Roster = ({ list, removeVideoFromList }) => {
         day["Supporting Vocals"].toLowerCase().includes(searchQuery.toLowerCase())
       )
     );
-  }).sort((a, b) => moment(a.Date, "Do MMMM YYYY").valueOf() - moment(b.Date, "Do MMMM YYYY").valueOf());
+  });
 
   const fetchRoster = async (page = 1, append = false) => {
     try {
