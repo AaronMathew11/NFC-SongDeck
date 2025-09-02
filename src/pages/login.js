@@ -33,16 +33,16 @@ const Login = () => {
   };
 
   return (
-    <div className="page-container min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md">
-        <div className="content-card animate-fade-in">
+    <div className="page-container min-h-screen flex items-center justify-center px-8">
+      <div className="w-full max-w-md mx-8">
+        <div className="animate-fade-in">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <FaBook className="text-2xl text-white" />
             </div>
             <h1 className="section-header text-center mb-2">Welcome back</h1>
             <p className="text-gray-500 text-sm">
-              Sign in to track your quiet time journey
+              Sign in to NFC South Worship App
             </p>
           </div>
 
@@ -55,7 +55,7 @@ const Login = () => {
             
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                   Email address
                 </label>
                 <div className="relative">
@@ -74,7 +74,7 @@ const Login = () => {
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                   Password
                 </label>
                 <div className="relative">
