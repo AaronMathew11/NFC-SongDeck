@@ -179,7 +179,11 @@ const QuietTime = () => {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      setSubmitFeedback('❌ Failed to upload note. Please try again.');
+      if (error.response?.status === 401) {
+        setSubmitFeedback('❌ Session expired. Please log out and log back in.');
+      } else {
+        setSubmitFeedback('❌ Failed to upload note. Please try again.');
+      }
     } finally {
       setUploading(false);
     }
