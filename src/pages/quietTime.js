@@ -25,9 +25,9 @@ const QuietTime = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('http://localhost:3000/api/getMyNotes', { headers }),
-        axios.get('http://localhost:3000/api/getMentees', { headers }),
-        axios.get('http://localhost:3000/api/getStats', { headers })
+        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMyNotes', { headers }),
+        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMentees', { headers }),
+        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getStats', { headers })
       ]);
       
       setMyNotes(notesRes.data);
@@ -78,7 +78,7 @@ const QuietTime = () => {
   const fetchMenteeNotes = async (menteeId) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(`http://localhost:3000/api/getMenteeNotes/${menteeId}`, { headers });
+      const response = await axios.get(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMenteeNotes/${menteeId}`, { headers });
       setMenteeNotes(response.data);
       setSelectedMentee(mentees.find(m => m._id === menteeId));
     } catch (error) {
@@ -113,7 +113,7 @@ const QuietTime = () => {
     formData.append('note', noteText);
 
     try {
-      await axios.post('http://localhost:3000/api/uploadQuietTimeNote', formData, {
+      await axios.post('https://nfcsongdeckbackend-et89zztk.b4a.run/api/uploadQuietTimeNote', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -343,11 +343,11 @@ const QuietTime = () => {
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <img
-                      src={`http://localhost:3000${note.imageUrl}`}
+                      src={`https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`}
                       alt="Quiet time note"
                       className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
                       onClick={() => setFullScreenImage({
-                        src: `http://localhost:3000${note.imageUrl}`,
+                        src: `https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`,
                         alt: 'Quiet time note',
                         note: note.note,
                         date: new Date(note.date).toLocaleDateString()
@@ -471,11 +471,11 @@ const QuietTime = () => {
                           </div>
                         </div>
                         <img
-                          src={`http://localhost:3000${note.imageUrl}`}
+                          src={`https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`}
                           alt="Mentee quiet time note"
                           className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
                           onClick={() => setFullScreenImage({
-                            src: `http://localhost:3000${note.imageUrl}`,
+                            src: `https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`,
                             alt: `${note.userId.name}'s quiet time note`,
                             note: note.note,
                             date: `${note.userId.name} - ${new Date(note.date).toLocaleDateString()}`

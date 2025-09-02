@@ -36,7 +36,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/register', {
+      const response = await axios.post('https://nfcsongdeckbackend-et89zztk.b4a.run/api/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password,

@@ -9,7 +9,7 @@ const TransitionalSongs = ({addVideoToList, removeVideoFromList, selectedVideos}
   useEffect(() => {
     const fetchTransitionalSongs = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/getSongsByCategory/Transitional');
+        const response = await axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getSongsByCategory/Transitional');
         setTransitionSongs(response.data.map(song => ({
           title: song.songName,
           youtubeId: song.youtubeId
