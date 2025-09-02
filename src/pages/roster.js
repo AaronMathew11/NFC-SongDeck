@@ -11,21 +11,23 @@ const Roster = ({ list, removeVideoFromList }) => {
   const [pagination, setPagination] = useState({});
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const filteredDays = roster.filter((day) => {
-    const formattedDate = moment(day.Date, "Do MMMM YYYY");
-    return (
-      formattedDate.isAfter(moment()) &&
-      (
-        day.Date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Lead/ Lyrics/ Posting"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Bass"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Keyboard"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Drums"].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        day["Supporting Vocals"].toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  });
+  const filteredDays = roster
+    .filter((day) => {
+      const formattedDate = moment(day.Date, "Do MMMM YYYY");
+      return (
+        formattedDate.isAfter(moment()) &&
+        (
+          day.Date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Lead/ Lyrics/ Posting"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Bass"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Keyboard"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Drums"].toLowerCase().includes(searchQuery.toLowerCase()) ||
+          day["Supporting Vocals"].toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    })
+    .sort((a, b) => moment(a.Date, "Do MMMM YYYY") - moment(b.Date, "Do MMMM YYYY"));
 
   const fetchRoster = async (page = 1, append = false) => {
     try {
