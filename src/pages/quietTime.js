@@ -304,7 +304,6 @@ const QuietTime = () => {
                   <input
                     type="file"
                     accept="image/*,image/heic,image/heif"
-                    capture="environment"
                     onChange={handleImageSelect}
                     className="hidden"
                     id="image-upload"
