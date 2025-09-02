@@ -439,7 +439,9 @@ const QuietTime = () => {
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {mentees.map((mentee, index) => (
+                    {mentees
+                      .sort((a, b) => new Date(b.lastQuietTime || 0) - new Date(a.lastQuietTime || 0))
+                      .map((mentee, index) => (
                       <div
                         key={mentee._id}
                         onClick={() => fetchMenteeNotes(mentee._id)}
@@ -567,7 +569,9 @@ const QuietTime = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {mentees.map((mentee, index) => {
+                    {mentees
+                      .sort((a, b) => new Date(b.lastQuietTime || 0) - new Date(a.lastQuietTime || 0))
+                      .map((mentee, index) => {
                       const lastActivity = mentee.lastQuietTime ? new Date(mentee.lastQuietTime) : null;
                       const daysSinceLastActivity = lastActivity ? Math.floor((new Date() - lastActivity) / (1000 * 60 * 60 * 24)) : null;
                       const streakStatus = (daysSinceLastActivity === null || daysSinceLastActivity >= 3) ? 'needs-attention' : 
