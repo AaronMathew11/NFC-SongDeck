@@ -7,9 +7,6 @@ const Roster = ({ list, removeVideoFromList }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [copiedDays, setCopiedDays] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState({});
-  const [loadingMore, setLoadingMore] = useState(false);
 
   const filteredDays = roster
     .filter((day) => {
@@ -41,12 +38,11 @@ const Roster = ({ list, removeVideoFromList }) => {
       return dateA - dateB;
     });
 
-  const fetchRoster = async (page = 1, append = false) => {
+  const fetchRoster = async () => {
     try {
-      if (!append) setLoading(true);
-      else setLoadingMore(true);
+      setLoading(true);
       
-      const response = await fetch(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster?page=${page}&limit=10`, {
+      const response = await fetch(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster?limit=1000`, {
         method: "GET",
         headers: new Headers({
           "ngrok-skip-browser-warning": "69420",
@@ -58,32 +54,18 @@ const Roster = ({ list, removeVideoFromList }) => {
       }
 
       const data = await response.json();
-      
-      if (append) {
-        setRoster(prev => [...prev, ...data.data]);
-      } else {
-        setRoster(data.data);
-      }
-      
-      setPagination(data.pagination);
-      setCurrentPage(page);
+      setRoster(data.data || data);
     } catch (error) {
       console.error("Error fetching roster:", error.message);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchRoster(1);
+    fetchRoster();
   }, []);
 
-  const loadMore = () => {
-    if (currentPage < pagination.pages && !loadingMore) {
-      fetchRoster(currentPage + 1, true);
-    }
-  };
 
   const getRoleIcon = (role) => {
     const iconClass = "text-sm";
@@ -232,20 +214,6 @@ const Roster = ({ list, removeVideoFromList }) => {
             </div>
           ))}
           
-          {/* Load More Button */}
-          {pagination.pages > currentPage && (
-            <div className="text-center mt-6">
-              <button
-                onClick={loadMore}
-                disabled={loadingMore}
-                className={`bg-gray-900 text-white px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
-                  loadingMore ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-800'
-                }`}
-              >
-                {loadingMore ? 'Loading...' : `Load More (${pagination.total - roster.length} remaining)`}
-              </button>
-            </div>
-          )}
         </div>
       )}
       </div>
