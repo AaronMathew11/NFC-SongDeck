@@ -18,7 +18,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('https://nfcsongdeckbackend-et89zztk.b4a.run/api/login', {
+      const response = await axios.post('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/login', {
         email,
         password
       });

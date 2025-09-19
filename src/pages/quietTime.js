@@ -19,15 +19,16 @@ const QuietTime = () => {
   const [noteText, setNoteText] = useState('');
   const [submitFeedback, setSubmitFeedback] = useState('');
   const [fullScreenImage, setFullScreenImage] = useState(null);
+  const [imageErrors, setImageErrors] = useState({});
 
   const fetchData = useCallback(async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMyNotes', { headers }),
-        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMentees', { headers }),
-        axios.get('https://nfcsongdeckbackend-et89zztk.b4a.run/api/getStats', { headers })
+        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMyNotes', { headers }),
+        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMentees', { headers }),
+        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getStats', { headers })
       ]);
       
       setMyNotes(notesRes.data);
@@ -75,10 +76,37 @@ const QuietTime = () => {
     };
   }, [fullScreenImage]);
 
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return null;
+    
+    // If imageUrl is a base64 data URL, use it directly
+    if (imageUrl.startsWith('data:')) {
+      return imageUrl;
+    }
+    
+    // If imageUrl already contains a full URL, use it as is
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // Legacy support: If imageUrl starts with /, prepend the backend URL
+    if (imageUrl.startsWith('/')) {
+      return `https://nfcsongdeckbackend-9fif8dbp.b4a.run${imageUrl}`;
+    }
+    
+    // Legacy support: If no leading slash, add one and prepend backend URL
+    return `https://nfcsongdeckbackend-9fif8dbp.b4a.run/${imageUrl}`;
+  };
+
+  const handleImageError = (noteId, imageUrl) => {
+    setImageErrors(prev => ({ ...prev, [noteId]: true }));
+    console.warn(`Failed to load image for note ${noteId}: ${imageUrl}`);
+  };
+
   const fetchMenteeNotes = async (menteeId) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getMenteeNotes/${menteeId}`, { headers });
+      const response = await axios.get(`https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMenteeNotes/${menteeId}`, { headers });
       setMenteeNotes(response.data);
       setSelectedMentee(mentees.find(m => m._id === menteeId));
     } catch (error) {
@@ -157,7 +185,7 @@ const QuietTime = () => {
     formData.append('note', noteText);
 
     try {
-      await axios.post('https://nfcsongdeckbackend-et89zztk.b4a.run/api/uploadQuietTimeNote', formData, {
+      await axios.post('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/uploadQuietTimeNote', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -396,17 +424,28 @@ const QuietTime = () => {
                     className="content-card overflow-hidden animate-slide-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <img
-                      src={`https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`}
-                      alt="Quiet time note"
-                      className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
-                      onClick={() => setFullScreenImage({
-                        src: `https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`,
-                        alt: 'Quiet time note',
-                        note: note.note,
-                        date: new Date(note.date).toLocaleDateString()
-                      })}
-                    />
+                    {imageErrors[note._id] ? (
+                      <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-t-2xl">
+                        <div className="text-center">
+                          <FaExclamationTriangle className="text-gray-400 text-3xl mb-2" />
+                          <p className="text-gray-500 text-sm">Image unavailable</p>
+                          <p className="text-gray-400 text-xs">Older note - image may be expired</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <img
+                        src={getImageUrl(note.imageUrl)}
+                        alt="Quiet time note"
+                        className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
+                        onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
+                        onClick={() => setFullScreenImage({
+                          src: getImageUrl(note.imageUrl),
+                          alt: 'Quiet time note',
+                          note: note.note,
+                          date: new Date(note.date).toLocaleDateString()
+                        })}
+                      />
+                    )}
                     <div className="p-4">
                       <div className="text-sm text-gray-500 font-medium mb-2">
                         {new Date(note.date).toLocaleDateString('en-US', { 
@@ -524,17 +563,28 @@ const QuietTime = () => {
                             </span>
                           </div>
                         </div>
-                        <img
-                          src={`https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`}
-                          alt="Mentee quiet time note"
-                          className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
-                          onClick={() => setFullScreenImage({
-                            src: `https://nfcsongdeckbackend-et89zztk.b4a.run${note.imageUrl}`,
-                            alt: `${note.userId.name}'s quiet time note`,
-                            note: note.note,
-                            date: `${note.userId.name} - ${new Date(note.date).toLocaleDateString()}`
-                          })}
-                        />
+                        {imageErrors[note._id] ? (
+                          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                            <div className="text-center">
+                              <FaExclamationTriangle className="text-gray-400 text-3xl mb-2" />
+                              <p className="text-gray-500 text-sm">Image unavailable</p>
+                              <p className="text-gray-400 text-xs">Older note - image may be expired</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <img
+                            src={getImageUrl(note.imageUrl)}
+                            alt="Mentee quiet time note"
+                            className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
+                            onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
+                            onClick={() => setFullScreenImage({
+                              src: getImageUrl(note.imageUrl),
+                              alt: `${note.userId.name}'s quiet time note`,
+                              note: note.note,
+                              date: `${note.userId.name} - ${new Date(note.date).toLocaleDateString()}`
+                            })}
+                          />
+                        )}
                         {note.note && (
                           <div className="p-4">
                             <p className="text-gray-700 text-sm leading-relaxed">{note.note}</p>

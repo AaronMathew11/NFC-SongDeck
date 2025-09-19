@@ -42,7 +42,7 @@ const Roster = ({ list, removeVideoFromList }) => {
     try {
       setLoading(true);
       
-      const response = await fetch(`https://nfcsongdeckbackend-et89zztk.b4a.run/api/getRoster?limit=1000`, {
+      const response = await fetch(`https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getRoster?limit=1000`, {
         method: "GET",
         headers: new Headers({
           "ngrok-skip-browser-warning": "69420",
