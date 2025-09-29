@@ -26,7 +26,7 @@ const Songs = () => {
         setLoading(false);
       } else {
         try {
-          const response = await fetch("https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getSongs", {
+          const response = await fetch("https://us-central1-nfc-worship-app.cloudfunctions.net/api/getSongs", {
             method: "GET",
             headers: new Headers({
               "ngrok-skip-browser-warning": "69420",

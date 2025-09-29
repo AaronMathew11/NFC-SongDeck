@@ -26,9 +26,9 @@ const QuietTime = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMyNotes', { headers }),
-        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMentees', { headers }),
-        axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getStats', { headers })
+        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/getMyNotes', { headers }),
+        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/getMentees', { headers }),
+        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/getStats', { headers })
       ]);
       
       setMyNotes(notesRes.data);
@@ -106,7 +106,7 @@ const QuietTime = () => {
   const fetchMenteeNotes = async (menteeId) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(`https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getMenteeNotes/${menteeId}`, { headers });
+      const response = await axios.get(`https://us-central1-nfc-worship-app.cloudfunctions.net/api/getMenteeNotes/${menteeId}`, { headers });
       setMenteeNotes(response.data);
       setSelectedMentee(mentees.find(m => m._id === menteeId));
     } catch (error) {
@@ -185,7 +185,7 @@ const QuietTime = () => {
     formData.append('note', noteText);
 
     try {
-      await axios.post('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/uploadQuietTimeNote', formData, {
+      await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/uploadQuietTimeNote', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

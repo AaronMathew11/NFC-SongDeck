@@ -9,7 +9,7 @@ const PraiseSongs = ({addVideoToList, removeVideoFromList, selectedVideos}) => {
   useEffect(() => {
     const fetchPraiseSongs = async () => {
       try {
-        const response = await axios.get('https://nfcsongdeckbackend-9fif8dbp.b4a.run/api/getSongsByCategory/Praise');
+        const response = await axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/getSongsByCategory/Praise');
         setPraiseSongs(response.data.map(song => ({
           title: song.songName,
           youtubeId: song.youtubeId
