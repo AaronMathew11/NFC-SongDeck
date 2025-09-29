@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FaCamera, FaFire, FaTrophy, FaCalendar, FaUsers, FaTimes, FaBook, FaChartLine, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
-import LogoutButton from '../Components/LogoutButton';
 import axios from 'axios';
 
 const QuietTime = () => {
@@ -79,28 +78,29 @@ const QuietTime = () => {
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return null;
     
-    // If imageUrl is a base64 data URL, use it directly
+    // If imageUrl is a base64 data URL, use it directly (current method)
     if (imageUrl.startsWith('data:')) {
       return imageUrl;
     }
     
-    // If imageUrl already contains a full URL, use it as is
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-    
-    // Legacy support: If imageUrl starts with /, prepend the backend URL
-    if (imageUrl.startsWith('/')) {
-      return `https://nfcsongdeckbackend-9fif8dbp.b4a.run${imageUrl}`;
-    }
-    
-    // Legacy support: If no leading slash, add one and prepend backend URL
-    return `https://nfcsongdeckbackend-9fif8dbp.b4a.run/${imageUrl}`;
+    // For any non-base64 images (legacy), return null to trigger error handling
+    // This will show the "image unavailable" fallback UI
+    return null;
+  };
+
+  const isImageAvailable = (note) => {
+    // Check if image is available and not in error state
+    return getImageUrl(note.imageUrl) !== null && !imageErrors[note._id];
+  };
+
+  const filterAvailableNotes = (notes) => {
+    // Filter out notes with unavailable images
+    return notes.filter(isImageAvailable);
   };
 
   const handleImageError = (noteId, imageUrl) => {
     setImageErrors(prev => ({ ...prev, [noteId]: true }));
-    console.warn(`Failed to load image for note ${noteId}: ${imageUrl}`);
+    console.warn(`Failed to load image for note ${noteId}: ${imageUrl || 'No URL provided'}`);
   };
 
   const fetchMenteeNotes = async (menteeId) => {
@@ -411,41 +411,37 @@ const QuietTime = () => {
 
           {activeTab === 'my-notes' && (
             <div className="space-y-4 animate-fade-in">
-              {myNotes.length === 0 ? (
-                <div className="content-card text-center">
-                  <FaBook className="text-4xl text-gray-400 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-900 mb-2">No notes yet</h3>
-                  <p className="text-gray-500 text-sm">Start your quiet time journey today!</p>
-                </div>
-              ) : (
-                myNotes.map((note, index) => (
+              {(() => {
+                const availableNotes = filterAvailableNotes(myNotes);
+                return availableNotes.length === 0 ? (
+                  <div className="content-card text-center">
+                    <FaBook className="text-4xl text-gray-400 mx-auto mb-4" />
+                    <h3 className="font-bold text-gray-900 mb-2">No notes available</h3>
+                    <p className="text-gray-500 text-sm">
+                      {myNotes.length === 0 
+                        ? "Start your quiet time journey today!" 
+                        : "Recent notes may have expired. Upload a new quiet time note!"}
+                    </p>
+                  </div>
+                ) : (
+                  availableNotes.map((note, index) => (
                   <div 
                     key={note._id} 
                     className="content-card overflow-hidden animate-slide-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    {imageErrors[note._id] ? (
-                      <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-t-2xl">
-                        <div className="text-center">
-                          <FaExclamationTriangle className="text-gray-400 text-3xl mb-2" />
-                          <p className="text-gray-500 text-sm">Image unavailable</p>
-                          <p className="text-gray-400 text-xs">Older note - image may be expired</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <img
-                        src={getImageUrl(note.imageUrl)}
-                        alt="Quiet time note"
-                        className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
-                        onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
-                        onClick={() => setFullScreenImage({
-                          src: getImageUrl(note.imageUrl),
-                          alt: 'Quiet time note',
-                          note: note.note,
-                          date: new Date(note.date).toLocaleDateString()
-                        })}
-                      />
-                    )}
+                    <img
+                      src={getImageUrl(note.imageUrl)}
+                      alt="Quiet time note"
+                      className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
+                      onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
+                      onClick={() => setFullScreenImage({
+                        src: getImageUrl(note.imageUrl),
+                        alt: 'Quiet time note',
+                        note: note.note,
+                        date: new Date(note.date).toLocaleDateString()
+                      })}
+                    />
                     <div className="p-4">
                       <div className="text-sm text-gray-500 font-medium mb-2">
                         {new Date(note.date).toLocaleDateString('en-US', { 
@@ -458,8 +454,9 @@ const QuietTime = () => {
                       {note.note && <p className="text-gray-700 text-sm leading-relaxed">{note.note}</p>}
                     </div>
                   </div>
-                ))
-              )}
+                  ))
+                );
+              })()}
             </div>
           )}
 
@@ -534,14 +531,20 @@ const QuietTime = () => {
                     </div>
                   </div>
                   
-                  {menteeNotes.length === 0 ? (
-                    <div className="content-card text-center">
-                      <FaBook className="text-4xl text-gray-400 mx-auto mb-4" />
-                      <h3 className="font-bold text-gray-900 mb-2">No notes yet</h3>
-                      <p className="text-gray-500 text-sm">{selectedMentee.name} hasn't uploaded any notes yet.</p>
-                    </div>
-                  ) : (
-                    menteeNotes.map((note, index) => (
+                  {(() => {
+                    const availableNotes = filterAvailableNotes(menteeNotes);
+                    return availableNotes.length === 0 ? (
+                      <div className="content-card text-center">
+                        <FaBook className="text-4xl text-gray-400 mx-auto mb-4" />
+                        <h3 className="font-bold text-gray-900 mb-2">No notes available</h3>
+                        <p className="text-gray-500 text-sm">
+                          {menteeNotes.length === 0 
+                            ? `${selectedMentee.name} hasn't uploaded any notes yet.`
+                            : `${selectedMentee.name}'s recent notes may have expired.`}
+                        </p>
+                      </div>
+                    ) : (
+                      availableNotes.map((note, index) => (
                       <div 
                         key={note._id} 
                         className="content-card overflow-hidden animate-slide-up"
@@ -563,36 +566,27 @@ const QuietTime = () => {
                             </span>
                           </div>
                         </div>
-                        {imageErrors[note._id] ? (
-                          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                            <div className="text-center">
-                              <FaExclamationTriangle className="text-gray-400 text-3xl mb-2" />
-                              <p className="text-gray-500 text-sm">Image unavailable</p>
-                              <p className="text-gray-400 text-xs">Older note - image may be expired</p>
-                            </div>
-                          </div>
-                        ) : (
-                          <img
-                            src={getImageUrl(note.imageUrl)}
-                            alt="Mentee quiet time note"
-                            className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
-                            onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
-                            onClick={() => setFullScreenImage({
-                              src: getImageUrl(note.imageUrl),
-                              alt: `${note.userId.name}'s quiet time note`,
-                              note: note.note,
-                              date: `${note.userId.name} - ${new Date(note.date).toLocaleDateString()}`
-                            })}
-                          />
-                        )}
+                        <img
+                          src={getImageUrl(note.imageUrl)}
+                          alt="Mentee quiet time note"
+                          className="w-full h-48 object-cover cursor-pointer hover:opacity-95 transition-all duration-200"
+                          onError={() => handleImageError(note._id, getImageUrl(note.imageUrl))}
+                          onClick={() => setFullScreenImage({
+                            src: getImageUrl(note.imageUrl),
+                            alt: `${note.userId.name}'s quiet time note`,
+                            note: note.note,
+                            date: `${note.userId.name} - ${new Date(note.date).toLocaleDateString()}`
+                          })}
+                        />
                         {note.note && (
                           <div className="p-4">
                             <p className="text-gray-700 text-sm leading-relaxed">{note.note}</p>
                           </div>
                         )}
                       </div>
-                    ))
-                  )}
+                      ))
+                    );
+                  })()}
                 </div>
               )}
             </div>
