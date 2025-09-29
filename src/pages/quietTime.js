@@ -177,18 +177,25 @@ const QuietTime = () => {
       return;
     }
 
+    if (!imagePreview) {
+      setSubmitFeedback('Image preview not available. Please try selecting the image again.');
+      return;
+    }
+
     setUploading(true);
     setSubmitFeedback('');
 
-    const formData = new FormData();
-    formData.append('image', selectedImage);
-    formData.append('note', noteText);
-
     try {
-      await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/uploadQuietTimeNote', formData, {
+      // Send base64 image data directly instead of FormData
+      const payload = {
+        image: imagePreview, // This is already base64 from the FileReader
+        note: noteText
+      };
+
+      await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/uploadQuietTimeNote', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
 
@@ -210,7 +217,8 @@ const QuietTime = () => {
       if (error.response?.status === 401) {
         setSubmitFeedback('❌ Session expired. Please log out and log back in.');
       } else {
-        setSubmitFeedback('❌ Failed to upload note. Please try again.');
+        const errorMessage = error.response?.data?.error || 'Failed to upload note. Please try again.';
+        setSubmitFeedback(`❌ ${errorMessage}`);
       }
     } finally {
       setUploading(false);
