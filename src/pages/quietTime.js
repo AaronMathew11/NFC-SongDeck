@@ -199,7 +199,20 @@ const QuietTime = () => {
         }
       });
 
-      setSubmitFeedback('✅ Quiet time note uploaded successfully!');
+      // Array of encouraging success messages
+      const successMessages = [
+        '✅ Quiet time note uploaded! Your spiritual journey continues 🙏',
+        '🌟 Upload successful! Another step in your faith walk',
+        '✅ Note saved! God sees your faithful heart ❤️',
+        '🎉 Upload complete! Your consistency is inspiring',
+        '✅ Successfully uploaded! Keep seeking His presence',
+        '🌅 Note captured! Another beautiful moment with God',
+        '✅ Upload successful! Your devotion is growing stronger',
+        '📖 Note saved! His word is living in your heart'
+      ];
+      
+      const randomMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+      setSubmitFeedback(randomMessage);
       
       setTimeout(() => {
         fetchData();
