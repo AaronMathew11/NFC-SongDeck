@@ -18,7 +18,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/login', {
+      const response = await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/login', {
         email,
         password
       });
