@@ -10,11 +10,12 @@ const Roster = ({ list, removeVideoFromList }) => {
 
   const filteredDays = roster
     .filter((day) => {
-      const formattedDate = moment(day.Date, "Do MMMM YYYY");
+      const formattedDate = moment(day.Date);
+      const formattedDateString = formattedDate.format("Do MMMM YYYY");
       return (
         formattedDate.isAfter(moment()) &&
         (
-          day.Date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          formattedDateString.toLowerCase().includes(searchQuery.toLowerCase()) ||
           day["Lead/ Lyrics/ Posting"].toLowerCase().includes(searchQuery.toLowerCase()) ||
           day["Guitar"].toLowerCase().includes(searchQuery.toLowerCase()) ||
           day["Bass"].toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -25,8 +26,8 @@ const Roster = ({ list, removeVideoFromList }) => {
       );
     })
     .sort((a, b) => {
-      const dateA = moment(a.Date, "Do MMMM YYYY");
-      const dateB = moment(b.Date, "Do MMMM YYYY");
+      const dateA = moment(a.Date);
+      const dateB = moment(b.Date);
       
       // Prioritize Sundays first, then sort by date
       const isSundayA = dateA.day() === 0;
@@ -89,7 +90,7 @@ const Roster = ({ list, removeVideoFromList }) => {
   };
 
   const copyRosterToClipboard = (day) => {
-    let rosterText = `Worship Team Roster - ${day.Date}\n\n`;
+    let rosterText = `Worship Team Roster - ${moment(day.Date).format("Do MMMM YYYY")}\n\n`;
     
     const roles = [
       { label: "Lead", value: day["Lead/ Lyrics/ Posting"] },
@@ -170,7 +171,7 @@ const Roster = ({ list, removeVideoFromList }) => {
             >
               {/* Date Header with Copy Button */}
               <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-gray-900">{day.Date}</h3>
+                <h3 className="font-semibold text-sm text-gray-900">{moment(day.Date).format("Do MMMM YYYY")}</h3>
                 <button
                   onClick={() => copyRosterToClipboard(day)}
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all duration-200 ${
