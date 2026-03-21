@@ -9,10 +9,12 @@ const CoreWorship = ({addVideoToList, removeVideoFromList, selectedVideos}) => {
   useEffect(() => {
     const fetchWorshipSongs = async () => {
       try {
-        const response = await axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getSongsByCategory/Worship');
+        const response = await axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getSongsByCategory/Worship');
         setWorshipSongs(response.data.map(song => ({
           title: song.songName,
-          youtubeId: song.youtubeId
+          youtubeId: song.youtubeId,
+          id: song._id || song.id,
+          chordSheet: song.chordSheet
         })));
       } catch (error) {
         console.error('Error fetching worship songs:', error);

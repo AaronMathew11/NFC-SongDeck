@@ -43,7 +43,7 @@ const Roster = ({ list, removeVideoFromList }) => {
     try {
       setLoading(true);
       
-      const response = await fetch(`https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getRoster?limit=1000`, {
+      const response = await fetch(`https://api-m2ugc4x7ma-uc.a.run.app/api/getRoster?limit=1000`, {
         method: "GET",
         headers: new Headers({
           "ngrok-skip-browser-warning": "69420",

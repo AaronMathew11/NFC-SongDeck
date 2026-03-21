@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaBook, FaFileAlt, FaCopy, FaStar, FaCheck } from 'react-icons/fa';
+import { FaCopy, FaCheck, FaSave, FaPaperPlane } from 'react-icons/fa';
+import { draftService } from '../utils/draftService';
 
 const MessageGeneratorPage = ({ selectedVideos }) => {
   const [theme, setTheme] = useState('');
@@ -10,6 +11,10 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
   const [bibleVerse, setBibleVerse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [draftTitle, setDraftTitle] = useState('');
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
 
   const fetchBibleVerses = async () => {
     if (!book || !chapter || !verse) return;
@@ -55,6 +60,60 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
 
 
     setMessage(generatedMessage);
+  };
+
+  const handleSaveDraft = () => {
+    if (!draftTitle.trim()) {
+      setSaveStatus('Please enter a title for your draft');
+      return;
+    }
+
+    try {
+      const scriptureRef = book && chapter && verse ? `${book} ${chapter}:${verse}` : '';
+      draftService.saveDraft(
+        draftTitle.trim(),
+        selectedVideos,
+        theme,
+        scriptureRef
+      );
+      
+      setSaveStatus('Draft saved successfully!');
+      setShowSaveDialog(false);
+      setDraftTitle('');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (error) {
+      setSaveStatus('Error saving draft');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
+  };
+
+  const handleRequestPublish = async () => {
+    if (!draftTitle.trim()) {
+      setSaveStatus('Please enter a title for your list');
+      return;
+    }
+
+    try {
+      const scriptureRef = book && chapter && verse ? `${book} ${chapter}:${verse}` : '';
+      console.log('selectedVideos before saveDraft:', selectedVideos); // Debug log
+      const draft = draftService.saveDraft(
+        draftTitle.trim(),
+        selectedVideos,
+        theme,
+        scriptureRef
+      );
+      console.log('draft after saveDraft:', draft); // Debug log
+      
+      await draftService.requestPublish(draft, message);
+      
+      setSaveStatus('Publish request sent to worship head!');
+      setShowPublishDialog(false);
+      setDraftTitle('');
+      setTimeout(() => setSaveStatus(''), 3000);
+    } catch (error) {
+      setSaveStatus('Error sending publish request');
+      setTimeout(() => setSaveStatus(''), 3000);
+    }
   };
 
   return (
@@ -128,6 +187,15 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
         </button>
       </div>
 
+      {/* Status Message */}
+      {saveStatus && (
+        <div className={`mb-4 p-3 rounded-xl text-center text-sm ${
+          saveStatus.includes('Error') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
+        } animate-fade-in`}>
+          {saveStatus}
+        </div>
+      )}
+
       {/* Generated Message */}
       {message && (
         <div className="space-y-4 animate-fade-in">
@@ -149,6 +217,94 @@ const MessageGeneratorPage = ({ selectedVideos }) => {
               <pre className="text-gray-800 text-xs leading-relaxed whitespace-pre-wrap break-words">
                 {message}
               </pre>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setShowSaveDialog(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl text-sm font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+            >
+              <FaSave />
+              <span>Save as Draft</span>
+            </button>
+            
+            <button
+              onClick={() => setShowPublishDialog(true)}
+              className="bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl text-sm font-semibold transition-colors duration-200 flex items-center justify-center space-x-2"
+            >
+              <FaPaperPlane />
+              <span>Request Publish</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Save Draft Dialog */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full animate-slide-up">
+            <h3 className="font-semibold text-lg text-gray-900 mb-4">Save as Draft</h3>
+            <input
+              type="text"
+              placeholder="Enter draft title..."
+              value={draftTitle}
+              onChange={(e) => setDraftTitle(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 mb-4"
+              autoFocus
+            />
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowSaveDialog(false);
+                  setDraftTitle('');
+                }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+              >
+                Save Draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Publish Request Dialog */}
+      {showPublishDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full animate-slide-up">
+            <h3 className="font-semibold text-lg text-gray-900 mb-2">Request Publish</h3>
+            <p className="text-gray-600 text-sm mb-4">This will send your list to the worship head for approval.</p>
+            <input
+              type="text"
+              placeholder="Enter list title..."
+              value={draftTitle}
+              onChange={(e) => setDraftTitle(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/10 mb-4"
+              autoFocus
+            />
+            <div className="flex space-x-3">
+              <button
+                onClick={() => {
+                  setShowPublishDialog(false);
+                  setDraftTitle('');
+                }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRequestPublish}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+              >
+                Send Request
+              </button>
             </div>
           </div>
         </div>

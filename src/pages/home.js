@@ -1,47 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaMusic, FaHeart, FaStar, FaCalendarWeek, FaSignOutAlt } from "react-icons/fa";
+import { FaMusic, FaHeart, FaStar, FaCalendarWeek, FaSignOutAlt, FaClipboardCheck, FaSave, FaCheckCircle, FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { draftService } from "../utils/draftService";
+import { canAccessWorshipHeadDashboard } from "../utils/permissions";
 import moment from "moment";
 
 const Home = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const [pendingRequests, setPendingRequests] = useState(0);
   
   const getCurrentDate = () => {
     return moment().format('DD MMM');
   };
+
+  useEffect(() => {
+    // Check for pending requests only if user is worship head
+    if (canAccessWorshipHeadDashboard(user)) {
+      const loadPendingCount = async () => {
+        try {
+          const count = await draftService.getPendingRequestsCount();
+          setPendingRequests(count);
+        } catch (error) {
+          console.error('Error loading pending requests count:', error);
+          setPendingRequests(0);
+        }
+      };
+      
+      loadPendingCount();
+    } else {
+      setPendingRequests(0);
+    }
+
+  }, [user]);
   
 
-  const songCategories = [
-    {
-      title: "Praise Songs",
-      subtitle: "50+ songs",
-      description: "Uplifting songs to glorify God's name",
-      icon: <FaMusic className="text-2xl text-white" />,
-      route: "/PraiseSongs",
-      bgColor: "bg-gray-900",
-      textColor: "text-white"
-    },
-    {
-      title: "Transitional Songs", 
-      subtitle: "40+ songs",
-      description: "Bridge between praise and worship",
-      icon: <FaStar className="text-2xl text-white" />,
-      route: "/TransitionalSongs",
-      bgColor: "bg-gray-900",
-      textColor: "text-white"
-    },
-    {
-      title: "Core Worship",
-      subtitle: "60+ songs",
-      description: "Intimate songs for deeper reverence",
-      icon: <FaHeart className="text-2xl text-white" />,
-      route: "/CoreWorship", 
-      bgColor: "bg-gray-900",
-      textColor: "text-white"
-    }
-  ];
 
   return (
     <>
@@ -55,10 +49,10 @@ const Home = () => {
               <p className="text-gray-500 text-xs mt-2">Today {getCurrentDate()}</p>
             </div>
             <button 
-              onClick={logout}
+              onClick={() => navigate('/profile')}
               className="w-12 h-12 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors duration-200"
             >
-              <FaSignOutAlt className="text-gray-600 text-lg" />
+              <FaUser className="text-gray-600 text-lg" />
             </button>
           </div>
         </div>
@@ -88,36 +82,78 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Song Selection Section */}
-      <div className="my-16">
-        <h3 className="text-lg font-bold text-gray-900 mb-6 text-left">Select songs for your list</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {songCategories.map((category, index) => (
-            <div
-              key={category.title}
-              className={`${category.bgColor} rounded-2xl p-6 cursor-pointer`}
-              onClick={() => navigate(category.route)}
-            >
-              <div className="flex items-start justify-between mb-3">
-                {category.icon}
-                <span className="text-white text-xs font-medium">{category.subtitle}</span>
+
+
+      {/* Worship Head Section - Only show for authorized users */}
+      {canAccessWorshipHeadDashboard(user) && (
+        <>
+          {pendingRequests > 0 && (
+            <div className="mb-8">
+              <div 
+                className="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 cursor-pointer hover:bg-amber-200 transition-colors"
+                onClick={() => navigate("/worship-head")}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <h4 className="text-gray-900 font-bold text-sm mb-1">Pending Approvals</h4>
+                    <p className="text-gray-700 text-xs">
+                      {pendingRequests} worship list{pendingRequests !== 1 ? 's' : ''} waiting for approval
+                    </p>
+                  </div>
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {pendingRequests}
+                  </span>
+                </div>
               </div>
-              <h4 className="text-white font-bold text-xs mb-1">{category.title}</h4>
-              <p className="text-white/80 text-xs">{category.description}</p>
             </div>
-          ))}
+          )}
+
+        </>
+      )}
+
+      {/* Main Actions Section */}
+      <div className="my-10">
+        <div className="space-y-4">
+          {/* Drafts Card */}
+          <div 
+            className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => navigate("/drafts")}
+          >
+            <div className="flex items-center">
+              <FaSave className="text-2xl text-gray-700 mr-6 ml-3" />
+              <div className="text-left py-2">
+                <h4 className="text-gray-900 font-bold text-sm mb-1">My Drafts</h4>
+                <p className="text-gray-600 text-xs">Saved worship lists</p>
+              </div>
+            </div>
+          </div>
+
+          {/* My Requests Card */}
+          <div 
+            className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => navigate("/requests")}
+          >
+            <div className="flex items-center">
+              <FaCheckCircle className="text-2xl text-gray-700 mr-6 ml-3" />
+              <div className="text-left py-2">
+                <h4 className="text-gray-900 font-bold text-sm mb-1">My Requests</h4>
+                <p className="text-gray-600 text-xs">Track submissions</p>
+              </div>
+            </div>
+          </div>
           
           {/* This Week's Songs Card */}
           <div 
-            className="bg-gray-200 rounded-2xl p-4 cursor-pointer"
+            className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
             onClick={() => navigate("/WeeklySongs")}
           >
-            <div className="flex items-start justify-between mb-3">
-              <FaCalendarWeek className="text-2xl text-gray-700" />
-              <span className="text-gray-700 text-xs font-medium">This week</span>
+            <div className="flex items-center ">
+              <FaCalendarWeek className="text-2xl text-gray-700 mr-6 ml-3" />
+              <div className="text-left py-2">
+                <h4 className="text-gray-900 font-bold text-sm mb-1">This Weeks Songs</h4>
+                <p className="text-gray-600 text-xs">Access chord sheets for approved lists</p>
+              </div>
             </div>
-            <h4 className="text-gray-900 font-bold text-xs mb-1">Weekly Songs</h4>
-            <p className="text-gray-600 text-xs">Access chord sheets</p>
           </div>
         </div>
       </div>

@@ -25,9 +25,9 @@ const QuietTime = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getMyNotes', { headers }),
-        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getMentees', { headers }),
-        axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getStats', { headers })
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMyNotes', { headers }),
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMentees', { headers }),
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getStats', { headers })
       ]);
       
       setMyNotes(notesRes.data);
@@ -44,6 +44,10 @@ const QuietTime = () => {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      // If it's an auth error, the user might need to log in again
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        console.log('Authentication error - user may need to log in again');
+      }
     } finally {
       setLoading(false);
     }
@@ -106,7 +110,7 @@ const QuietTime = () => {
   const fetchMenteeNotes = async (menteeId) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(`https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getMenteeNotes/${menteeId}`, { headers });
+      const response = await axios.get(`https://api-m2ugc4x7ma-uc.a.run.app/api/getMenteeNotes/${menteeId}`, { headers });
       setMenteeNotes(response.data);
       setSelectedMentee(mentees.find(m => m._id === menteeId));
     } catch (error) {
@@ -192,7 +196,7 @@ const QuietTime = () => {
         note: noteText
       };
 
-      await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/uploadQuietTimeNote', payload, {
+      await axios.post('https://api-m2ugc4x7ma-uc.a.run.app/api/uploadQuietTimeNote', payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -717,7 +721,12 @@ const QuietTime = () => {
                                 <span className="text-sm font-medium text-gray-700">Weekly Average</span>
                               </div>
                               <span className="text-sm text-gray-600">
-                                {mentee.totalQuietTimes ? Math.round((mentee.totalQuietTimes / (mentee.daysSinceMentor || 1)) * 7 * 10) / 10 : 0} notes/week
+                                {(() => {
+                                  if (!mentee.totalQuietTimes) return 0;
+                                  const daysSinceJoined = mentee.createdAt ? Math.max(1, Math.floor((new Date() - new Date(mentee.createdAt)) / (1000 * 60 * 60 * 24))) : 7;
+                                  const weeksActive = daysSinceJoined / 7;
+                                  return Math.round((mentee.totalQuietTimes / weeksActive) * 10) / 10;
+                                })()} notes/week
                               </span>
                             </div>
 

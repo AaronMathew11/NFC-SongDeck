@@ -12,13 +12,14 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const response = await axios.post('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/login', {
+      const response = await axios.post('https://api-m2ugc4x7ma-uc.a.run.app/api/login', {
         email,
         password
       });
@@ -102,6 +103,7 @@ const Login = () => {
             </button>
 
           </form>
+
         </div>
       </div>
     </div>

@@ -5,8 +5,8 @@ import { NavLink } from 'react-router-dom';
 const BottomNav = () => {
   return (
     <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-gray-900 rounded-full px-8 py-4 shadow-lg">
-        <div className="flex items-center space-x-12">
+      <div className="bg-gray-900 rounded-full px-6 py-4 shadow-lg">
+        <div className="flex items-center space-x-8">
           <NavLink 
             to="/" 
             className={({ isActive }) =>

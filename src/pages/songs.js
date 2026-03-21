@@ -14,39 +14,24 @@ const Songs = () => {
 
   useEffect(() => {
     const fetchSongs = async () => {
-      const cacheExpiryTime = 3600 * 1000;
-      const cachedData = localStorage.getItem("songs");
-      const cachedTimestamp = localStorage.getItem("songsTimestamp");
+      try {
+        const response = await fetch("https://api-m2ugc4x7ma-uc.a.run.app/api/getSongs", {
+          method: "GET",
+          headers: new Headers({
+            "ngrok-skip-browser-warning": "69420",
+          }),
+        });
 
-      const isCacheValid =
-        cachedData && cachedTimestamp && Date.now() - cachedTimestamp < cacheExpiryTime;
-
-      if (isCacheValid) {
-        setSongs(JSON.parse(cachedData));
-        setLoading(false);
-      } else {
-        try {
-          const response = await fetch("https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getSongs", {
-            method: "GET",
-            headers: new Headers({
-              "ngrok-skip-browser-warning": "69420",
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          setSongs(data.data);
-
-          localStorage.setItem("songs", JSON.stringify(data.data));
-          localStorage.setItem("songsTimestamp", Date.now());
-        } catch (error) {
-          console.error("Error fetching songs:", error.message);
-        } finally {
-          setLoading(false);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const data = await response.json();
+        setSongs(data.data);
+      } catch (error) {
+        console.error("Error fetching songs:", error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -151,12 +136,18 @@ const Songs = () => {
                   </div>
                 </div>
                 
-                <button
-                  onClick={() => openLink(song.link)}
-                  className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 flex items-center justify-center"
-                >
-                  <FaExternalLinkAlt className="text-xs" />
-                </button>
+                {song.link ? (
+                  <button
+                    onClick={() => openLink(song.link)}
+                    className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 flex items-center justify-center"
+                  >
+                    <FaExternalLinkAlt className="text-xs" />
+                  </button>
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-gray-300 text-gray-500 transition-all duration-200 flex items-center justify-center cursor-not-allowed">
+                    <FaExternalLinkAlt className="text-xs opacity-50" />
+                  </div>
+                )}
               </div>
             </div>
           ))}

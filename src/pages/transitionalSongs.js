@@ -9,10 +9,12 @@ const TransitionalSongs = ({addVideoToList, removeVideoFromList, selectedVideos}
   useEffect(() => {
     const fetchTransitionalSongs = async () => {
       try {
-        const response = await axios.get('https://us-central1-nfc-worship-app.cloudfunctions.net/api/api/getSongsByCategory/Transitional');
+        const response = await axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getSongsByCategory/Transitional');
         setTransitionSongs(response.data.map(song => ({
           title: song.songName,
-          youtubeId: song.youtubeId
+          youtubeId: song.youtubeId,
+          id: song._id || song.id,
+          chordSheet: song.chordSheet
         })));
       } catch (error) {
         console.error('Error fetching transitional songs:', error);
