@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTrash, FaMusic, FaSave, FaPaperPlane, FaGripVertical, FaCalendarAlt, FaCopy, FaCheck, FaPlus, FaTimes } from 'react-icons/fa';
+import { FaTrash, FaMusic, FaSave, FaPaperPlane, FaGripVertical, FaCalendarAlt, FaPlus, FaTimes } from 'react-icons/fa';
 import listImage from '../images/listImage.png';
 import { draftService } from '../utils/draftService';
 
@@ -14,9 +14,6 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
   const [chapter, setChapter] = useState('');
   const [verse, setVerse] = useState('');
   const [message, setMessage] = useState('');
-  const [bibleVerse, setBibleVerse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
@@ -108,21 +105,6 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
     e.preventDefault();
   };
 
-  const fetchBibleVerses = async () => {
-    if (!book || !chapter || !verse) return;
-    
-    setIsLoading(true);
-    try {
-      const response = await fetch(`https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/en-kjv/books/${book.toLowerCase()}/chapters/${chapter}/verses/${verse}.json`);
-      const data = await response.json();
-      setBibleVerse(data.text);
-    } catch (error) {
-      console.error('Error fetching Bible verse:', error);
-      setBibleVerse('Could not fetch verse. Please check your input.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const generateMessage = () => {
     const formattedDate = worshipDate ? new Date(worshipDate).toLocaleDateString('en-US', {
@@ -147,14 +129,6 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
     setMessage(generatedMessage);
   };
 
-  const copyToClipboard = () => {
-    if (navigator.clipboard && message) {
-      navigator.clipboard.writeText(message).then(() => {
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      });
-    }
-  };
 
   const handleSaveDraft = () => {
     if (!playlistName.trim()) {

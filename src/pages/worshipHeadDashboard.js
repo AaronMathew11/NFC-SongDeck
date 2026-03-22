@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FaMusic, FaCheck, FaTimes, FaCalendarAlt, FaUser, FaEye, FaClock, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaCalendarAlt, FaUser, FaEye } from 'react-icons/fa';
 import { draftService } from '../utils/draftService';
-import { useAuth } from '../context/AuthContext';
-import { canAccessWorshipHeadDashboard } from '../utils/permissions';
 
 const WorshipHeadDashboard = () => {
-  const { user } = useAuth();
   const [publishRequests, setPublishRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadPublishRequests();
@@ -21,14 +17,8 @@ const WorshipHeadDashboard = () => {
       console.log('Loaded publish requests:', requests);
       console.log('First request structure:', requests[0]);
       setPublishRequests(requests);
-      setError(null);
     } catch (error) {
       console.error('Error loading publish requests:', error);
-      if (error.response && error.response.status === 403) {
-        setError('Access denied. Only authorized worship heads can view requests.');
-      } else {
-        setError('Error loading publish requests. Please try again.');
-      }
       setPublishRequests([]);
     }
   };
@@ -84,7 +74,7 @@ const WorshipHeadDashboard = () => {
       <div className="bg-gray-900 text-white">
         <div className="max-w-md mx-auto px-4">
           <div className="text-center pt-6 pb-4 animate-fade-in">
-            <h1 className="text-lg font-bold text-white mb-2">Worship Head Dashboard</h1>
+            <h1 className="text-lg font-bold text-white mb-2">Worship list Review</h1>
             <p className="text-gray-300 text-xs max-w-sm mx-auto leading-relaxed">
               Review and manage worship list requests
             </p>

@@ -1,30 +1,33 @@
 // App.js
 import './App.css';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import {
     Route,
     Routes,
     Navigate
 } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { canAccessWorshipHeadDashboard } from './utils/permissions';
 import Home from './pages/home';
 import List from './pages/list';
 import SelectedSongs from './pages/selectedSongs';
 import Recomendation from './pages/recomendation';
-import BottomNav from './Components/bottomNav';
-import PraiseSongs from './pages/praiseSongs';
-import CoreWorship from './pages/coreWorship';
-import TransitionalSongs from './pages/transitionalSongs';
 import Login from './pages/login';
-import QuietTime from './pages/quietTime';
-import { useState, useEffect } from 'react';
 import Roster from './pages/roster';
 import Songs from './pages/songs';
 import Drafts from './pages/drafts';
 import Requests from './pages/requests';
 import WorshipHeadDashboard from './pages/worshipHeadDashboard';
 import Profile from './pages/profile';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { canAccessWorshipHeadDashboard } from './utils/permissions';
+import AdminResources from './pages/adminResources';
+import SharedResources from './pages/sharedResources';
+import BottomNav from './Components/bottomNav';
+import PraiseSongs from './pages/praiseSongs';
+import CoreWorship from './pages/coreWorship';
+import TransitionalSongs from './pages/transitionalSongs';
+
+const QuietTime = lazy(() => import('./pages/quietTime'));
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();
@@ -160,7 +163,16 @@ const AppContent = () => {
                 
                 <Route path="/quiet-time" element={
                     <ProtectedRoute>
-                        <QuietTime />
+                        <Suspense fallback={
+                            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                                <div className="text-center">
+                                    <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
+                                    <p className="text-gray-600 text-sm">Loading Quiet Time...</p>
+                                </div>
+                            </div>
+                        }>
+                            <QuietTime />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 
@@ -187,6 +199,18 @@ const AppContent = () => {
                         <Profile />
                     </ProtectedRoute>
                 } />
+                
+                <Route path="/admin-resources" element={
+                    <WorshipHeadRoute>
+                        <AdminResources />
+                    </WorshipHeadRoute>
+                } />
+                
+                <Route path="/shared-resources" element={
+                    <ProtectedRoute>
+                        <SharedResources />
+                    </ProtectedRoute>
+                } />
             </Routes>
         </div>
     );
@@ -194,7 +218,7 @@ const AppContent = () => {
 
 function App() {
     return (
-        <GoogleOAuthProvider clientId="766869568873-mcprcl4se790vf5tueeigo30em04va64.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || "GOOGLE_CLIENT_ID_NOT_SET"}>
             <AuthProvider>
                 <AppContent />
             </AuthProvider>

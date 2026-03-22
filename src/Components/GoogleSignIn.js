@@ -2,7 +2,7 @@ import React from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api-m2ugc4x7ma-uc.a.run.app/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://api-m2ugc4x7ma-uc.a.run.app/api';
 
 const GoogleSignIn = ({ onSignInSuccess, isSignUp = false }) => {
   const login = useGoogleLogin({

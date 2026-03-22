@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
-import { FaUsers, FaCalendarAlt, FaGuitar, FaSearch, FaMicrophone, FaMusic, FaDrum, FaCopy, FaCheck } from "react-icons/fa";
+import { FaCalendarAlt, FaSearch, FaCopy, FaCheck } from "react-icons/fa";
 
 const Roster = ({ list, removeVideoFromList }) => {
   const [roster, setRoster] = useState([]);
@@ -68,26 +68,6 @@ const Roster = ({ list, removeVideoFromList }) => {
   }, []);
 
 
-  const getRoleIcon = (role) => {
-    const iconClass = "text-sm";
-    switch (role.toLowerCase()) {
-      case 'lead':
-      case 'lead/ lyrics/ posting':
-        return <FaMicrophone className={`${iconClass} text-primary-500`} />;
-      case 'guitar':
-        return <FaGuitar className={`${iconClass} text-accent-500`} />;
-      case 'bass':
-        return <FaMusic className={`${iconClass} text-blue-500`} />;
-      case 'keyboard':
-        return <FaMusic className={`${iconClass} text-purple-500`} />;
-      case 'drums':
-        return <FaDrum className={`${iconClass} text-red-500`} />;
-      case 'supporting vocals':
-        return <FaUsers className={`${iconClass} text-pink-500`} />;
-      default:
-        return <FaMusic className={`${iconClass} text-navy-500`} />;
-    }
-  };
 
   const copyRosterToClipboard = (day) => {
     let rosterText = `Worship Team Roster - ${moment(day.Date).format("Do MMMM YYYY")}\n\n`;

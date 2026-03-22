@@ -23,11 +23,12 @@ const QuietTime = () => {
   const fetchData = useCallback(async () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
+      const timeout = 10000; // 10 second timeout
       
       const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMyNotes', { headers }),
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMentees', { headers }),
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getStats', { headers })
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMyNotes', { headers, timeout }),
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMentees', { headers, timeout }),
+        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getStats', { headers, timeout })
       ]);
       
       setMyNotes(notesRes.data);
@@ -44,20 +45,32 @@ const QuietTime = () => {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      
+      // Set default values to allow page to render
+      setMyNotes([]);
+      setMentees([]);
+      setStats({
+        currentStreak: 0,
+        longestStreak: 0,
+        totalQuietTimes: 0
+      });
+      
       // If it's an auth error, the user might need to log in again
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
         console.log('Authentication error - user may need to log in again');
+      } else if (error.code === 'ECONNABORTED') {
+        console.log('Request timeout - please try again');
       }
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, user, updateUser]);
 
   useEffect(() => {
     if (token) {
       fetchData();
     }
-  }, [token]);
+  }, [token, fetchData]);
 
   useEffect(() => {
     const handleKeyPress = (e) => {

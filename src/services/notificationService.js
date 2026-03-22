@@ -2,7 +2,7 @@ import { messaging, getToken, onMessage, isSupported } from '../firebase/config'
 
 class NotificationService {
   constructor() {
-    this.vapidKey = 'BO10PIRfD-16y-bMkdyqHHtWNH8BR_j30zoM0mFYrD9v6mtwS3n-ZJv2lHeitVP42KCk67HWOEo-8F6kQY-sKuQ'; // You'll need to generate this
+    this.vapidKey = process.env.REACT_APP_VAPID_KEY || 'VAPID_KEY_NOT_SET';
     this.token = null;
     this.isSupported = this.checkSupport();
   }

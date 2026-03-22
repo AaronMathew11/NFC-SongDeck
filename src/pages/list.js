@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaTrash, FaMusic, FaArrowRight, FaListUl, FaFilter, FaPlus, FaCheck, FaTimes, FaPlay, FaSearch } from 'react-icons/fa';
+import { FaMusic, FaArrowRight, FaFilter, FaPlus, FaCheck, FaPlay } from 'react-icons/fa';
 import axios from 'axios';
 
 const List = ({ list, addVideoToList, removeVideoFromList }) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaMusic, FaTrash, FaEdit, FaClock, FaEye } from 'react-icons/fa';
+import { FaMusic, FaClock, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { draftService } from '../utils/draftService';
 
@@ -39,12 +39,6 @@ const DraftsPage = ({ loadDraftToList }) => {
     }
   };
 
-  const handleDeleteDraft = async (draftId) => {
-    if (window.confirm('Are you sure you want to delete this draft?')) {
-      draftService.deleteDraft(draftId);
-      await loadDrafts();
-    }
-  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
