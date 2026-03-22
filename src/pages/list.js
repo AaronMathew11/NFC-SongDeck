@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { FaMusic, FaArrowRight, FaFilter, FaPlus, FaCheck, FaPlay } from 'react-icons/fa';
 import axios from 'axios';
@@ -74,7 +74,7 @@ const List = ({ list, addVideoToList, removeVideoFromList }) => {
     }
   };
 
-  const filterSongs = () => {
+  const filterSongs = useCallback(() => {
     let filtered = allSongs;
 
     // Filter by search term
@@ -100,11 +100,11 @@ const List = ({ list, addVideoToList, removeVideoFromList }) => {
     }
 
     setFilteredSongs(filtered);
-  };
+  }, [allSongs, searchTerm, selectedCategory, selectedBranch, selectedTag]);
 
   useEffect(() => {
     filterSongs();
-  }, [searchTerm, selectedCategory, selectedBranch, selectedTag, allSongs]);
+  }, [searchTerm, selectedCategory, selectedBranch, selectedTag, allSongs, filterSongs]);
 
   const isSongSelected = (song) => {
     return list.some(listSong => listSong.id === (song.id || song._id));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTrash, FaMusic, FaSave, FaPaperPlane, FaGripVertical, FaCalendarAlt, FaPlus, FaTimes } from 'react-icons/fa';
 import listImage from '../images/listImage.png';
@@ -57,12 +57,6 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
     nextSunday.setDate(today.getDate() + (7 - today.getDay()));
     setWorshipDate(nextSunday.toISOString().split('T')[0]);
   }, []);
-  
-  useEffect(() => {
-    if (theme && book && chapter && verse) {
-      generateMessage();
-    }
-  }, [theme, book, chapter, verse, list, worshipDate, playlistName]);
 
   const handleDragStart = (e, index) => {
     e.stopPropagation();
@@ -106,7 +100,7 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
   };
 
 
-  const generateMessage = () => {
+  const generateMessage = useCallback(() => {
     const formattedDate = worshipDate ? new Date(worshipDate).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -127,8 +121,13 @@ const SelectedSongs = ({ list, removeVideoFromList, reorderSongs, addVideoToList
     }
 
     setMessage(generatedMessage);
-  };
+  }, [worshipDate, theme, book, chapter, verse, list, playlistName]);
 
+  useEffect(() => {
+    if (theme && book && chapter && verse) {
+      generateMessage();
+    }
+  }, [theme, book, chapter, verse, list, worshipDate, playlistName, generateMessage]);
 
   const handleSaveDraft = () => {
     if (!playlistName.trim()) {

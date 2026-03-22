@@ -21,11 +21,18 @@ const Home = () => {
 
   const loadCurrentVerse = async () => {
     try {
-      // For now, load from localStorage, later replace with API call
-      const saved = localStorage.getItem('communityVerse');
-      if (saved) {
-        setCurrentVerse(JSON.parse(saved));
+      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/verse');
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentVerse({
+          text: data.verse,
+          author: data.setBy?.name || 'Community',
+          date: moment(data.setAt).format('MMM DD, YYYY')
+        });
       } else {
+        console.error('Failed to load verse:', response.statusText);
+        // Fallback to default verse
         setCurrentVerse({
           text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
           author: "Admin",
@@ -34,6 +41,12 @@ const Home = () => {
       }
     } catch (error) {
       console.error('Error loading verse:', error);
+      // Fallback to default verse
+      setCurrentVerse({
+        text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future.",
+        author: "Admin", 
+        date: moment().format('MMM DD, YYYY')
+      });
     }
   };
 
@@ -49,19 +62,36 @@ const Home = () => {
     }
   };
 
-  const handleVerseSubmit = () => {
+  const handleVerseSubmit = async () => {
     if (!newVerse.trim()) return;
     
-    const updatedVerse = {
-      text: newVerse.trim(),
-      author: user?.name || 'Anonymous',
-      date: moment().format('MMM DD, YYYY')
-    };
-    
-    setCurrentVerse(updatedVerse);
-    localStorage.setItem('communityVerse', JSON.stringify(updatedVerse));
-    setNewVerse('');
-    setShowVerseEdit(false);
+    try {
+      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/verse', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || 'test'}`
+        },
+        body: JSON.stringify({
+          verse: newVerse.trim(),
+          reference: 'Custom verse' // You could add a reference field to the form if needed
+        })
+      });
+
+      if (response.ok) {
+        // Reload the verse from the server to get updated data
+        await loadCurrentVerse();
+        setNewVerse('');
+        setShowVerseEdit(false);
+      } else {
+        const error = await response.text();
+        console.error('Failed to update verse:', error);
+        alert('Failed to update verse: ' + error);
+      }
+    } catch (error) {
+      console.error('Error updating verse:', error);
+      alert('Error updating verse: ' + error.message);
+    }
   };
 
   useEffect(() => {
@@ -193,6 +223,23 @@ const Home = () => {
               </div>
             </div>
           </div>
+
+
+          {/* Shared Resources Section */}
+          {sharedResources.length > 0 && (
+            <div 
+              className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
+              onClick={() => navigate("/shared-resources")}
+            >
+              <div className="flex items-center">
+                <FaFolder className="text-2xl text-gray-700 mr-6 ml-3" />
+                <div className="text-left py-2">
+                  <h4 className="text-gray-900 font-bold text-sm mb-1">Shared Resources</h4>
+                  <p className="text-gray-600 text-xs">Access files and documents ({sharedResources.length} items)</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* This Week's Songs Card */}
           <div 
@@ -267,21 +314,6 @@ const Home = () => {
             )}
           </div>
 
-          {/* Shared Resources Section */}
-          {sharedResources.length > 0 && (
-            <div 
-              className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
-              onClick={() => navigate("/shared-resources")}
-            >
-              <div className="flex items-center">
-                <FaFolder className="text-2xl text-gray-700 mr-6 ml-3" />
-                <div className="text-left py-2">
-                  <h4 className="text-gray-900 font-bold text-sm mb-1">Shared Resources</h4>
-                  <p className="text-gray-600 text-xs">Access files and documents ({sharedResources.length} items)</p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

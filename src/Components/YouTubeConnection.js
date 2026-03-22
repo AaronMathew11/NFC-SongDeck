@@ -79,7 +79,7 @@ const YouTubeConnection = () => {
     }
 
     try {
-      const response = await api.post('/youtube/disconnect');
+      const response = await api.delete('/youtube/disconnect');
       
       if (response.data.success) {
         setIsConnected(false);
