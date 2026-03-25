@@ -11,11 +11,19 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
+// Add token to requests with iOS fallback
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  let token = localStorage.getItem('token');
+  
+  // iOS fallback: try sessionStorage if localStorage is cleared
+  if (!token && typeof sessionStorage !== 'undefined') {
+    token = sessionStorage.getItem('token');
+  }
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    console.warn('No authentication token found in localStorage or sessionStorage');
   }
   return config;
 });
@@ -24,9 +32,18 @@ const YouTubeConnection = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     checkConnectionStatus();
+    
+    // Check if returning from YouTube OAuth
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('youtube') === 'connected') {
+      // Clear the URL parameter and recheck connection
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setTimeout(() => checkConnectionStatus(), 1000);
+    }
   }, []);
 
   const checkConnectionStatus = async () => {
@@ -38,6 +55,13 @@ const YouTubeConnection = () => {
       }
     } catch (error) {
       console.error('Error checking YouTube connection:', error);
+      // Set default state if status check fails
+      setIsConnected(false);
+      if (error.response?.status === 401) {
+        setError('Please log in again to check YouTube connection');
+      } else {
+        setError('Failed to check YouTube connection status');
+      }
     } finally {
       setLoading(false);
     }
@@ -46,16 +70,36 @@ const YouTubeConnection = () => {
   const handleConnect = async () => {
     try {
       setConnecting(true);
+      setError(null);
       
       const response = await api.get('/youtube/auth');
       
       if (response.data.success && response.data.authUrl) {
-        // Open popup window for OAuth
+        // Detect iOS and handle differently
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+        
+        if (isIOS && isPWA) {
+          // On iOS PWA, open in same window instead of popup
+          window.location.href = response.data.authUrl;
+          return;
+        }
+        
+        // Open popup window for OAuth (desktop and iOS Safari)
         const popup = window.open(
           response.data.authUrl, 
           'youtube-auth', 
           'width=600,height=700,scrollbars=yes,resizable=yes'
         );
+        
+        if (!popup) {
+          // Fallback for iOS: open in same window
+          if (isIOS) {
+            window.location.href = response.data.authUrl;
+            return;
+          }
+          throw new Error('Failed to open popup. Please allow popups for this site.');
+        }
         
         // Listen for popup closure or success
         const checkClosed = setInterval(() => {
@@ -66,10 +110,20 @@ const YouTubeConnection = () => {
             setTimeout(() => checkConnectionStatus(), 1000);
           }
         }, 1000);
+      } else {
+        throw new Error('Failed to get authorization URL');
       }
     } catch (error) {
       console.error('Error starting YouTube connection:', error);
       setConnecting(false);
+      
+      if (error.response?.status === 401) {
+        setError('Please log in again to connect YouTube');
+      } else if (error.message.includes('popup')) {
+        setError('Please enable popups and try again');
+      } else {
+        setError('Failed to start YouTube connection. Please try again.');
+      }
     }
   };
 
@@ -79,6 +133,7 @@ const YouTubeConnection = () => {
     }
 
     try {
+      setError(null);
       const response = await api.delete('/youtube/disconnect');
       
       if (response.data.success) {
@@ -86,6 +141,12 @@ const YouTubeConnection = () => {
       }
     } catch (error) {
       console.error('Error disconnecting YouTube:', error);
+      
+      if (error.response?.status === 401) {
+        setError('Please log in again to disconnect YouTube');
+      } else {
+        setError('Failed to disconnect YouTube. Please try again.');
+      }
     }
   };
 
@@ -140,6 +201,18 @@ const YouTubeConnection = () => {
           </button>
         </div>
       </div>
+      
+      {error && (
+        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-1 text-xs text-red-500 hover:text-red-700 underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 };
