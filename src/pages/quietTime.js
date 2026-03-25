@@ -46,18 +46,20 @@ const QuietTime = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
       
-      // Set default values to allow page to render
+      // Only set empty arrays for notes and mentees to prevent rendering errors
+      // Keep existing stats values to prevent analytics from resetting to 0
       setMyNotes([]);
       setMentees([]);
-      setStats({
-        currentStreak: 0,
-        longestStreak: 0,
-        totalQuietTimes: 0
-      });
       
       // If it's an auth error, the user might need to log in again
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
         console.log('Authentication error - user may need to log in again');
+        // Only reset stats on auth errors
+        setStats({
+          currentStreak: 0,
+          longestStreak: 0,
+          totalQuietTimes: 0
+        });
       } else if (error.code === 'ECONNABORTED') {
         console.log('Request timeout - please try again');
       }
@@ -70,6 +72,22 @@ const QuietTime = () => {
     if (token) {
       fetchData();
     }
+  }, [token, fetchData]);
+
+  // Handle page visibility changes to prevent unnecessary API calls when app is in background
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && token) {
+        // Only refetch data when page becomes visible again after being hidden
+        fetchData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [token, fetchData]);
 
   useEffect(() => {
