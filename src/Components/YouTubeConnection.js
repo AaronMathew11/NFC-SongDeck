@@ -48,6 +48,7 @@ const YouTubeConnection = () => {
       const errorMessage = urlParams.get('message') || 'YouTube connection failed';
       setError(errorMessage);
       setConnecting(false);
+      setIsConnected(false); // Ensure toggle shows as disconnected
       // Clear the URL parameter
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -113,8 +114,14 @@ const YouTubeConnection = () => {
           if (popup.closed) {
             clearInterval(checkClosed);
             setConnecting(false);
-            // Recheck connection status after popup closes
-            setTimeout(() => checkConnectionStatus(), 1000);
+            // Only recheck connection status after a short delay
+            // The URL params will handle showing success/error messages
+            setTimeout(() => {
+              // Only recheck if we're not already showing an error
+              if (!error) {
+                checkConnectionStatus();
+              }
+            }, 500);
           }
         }, 1000);
       } else {
