@@ -2,9 +2,13 @@ import { messaging, getToken, onMessage, isSupported } from '../firebase/config'
 
 class NotificationService {
   constructor() {
-    this.vapidKey = process.env.REACT_APP_VAPID_KEY || 'VAPID_KEY_NOT_SET';
+    this.vapidKey = process.env.REACT_APP_VAPID_KEY;
     this.token = null;
     this.isSupported = this.checkSupport();
+    
+    if (!this.vapidKey) {
+      console.warn('VAPID key not configured. Push notifications may not work properly.');
+    }
   }
 
   checkSupport() {
@@ -87,10 +91,16 @@ class NotificationService {
         throw new Error('Firebase messaging not initialized');
       }
       
-      const currentToken = await getToken(messaging, {
-        vapidKey: this.vapidKey,
+      const tokenConfig = {
         serviceWorkerRegistration: registration
-      });
+      };
+      
+      // Only add VAPID key if it's configured
+      if (this.vapidKey) {
+        tokenConfig.vapidKey = this.vapidKey;
+      }
+      
+      const currentToken = await getToken(messaging, tokenConfig);
       
       if (currentToken) {
         console.log('FCM Token:', currentToken);
@@ -176,10 +186,45 @@ class NotificationService {
     setupListener();
   }
 
+  async isUserSubscribed() {
+    try {
+      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        return !!(userData.data?.fcmToken);
+      }
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+    }
+    return false;
+  }
+
   async unsubscribe() {
-    // Remove token from server and clear local storage
-    if (this.token) {
-      await this.removeTokenFromServer(this.token);
+    try {
+      // Get current token if not available
+      if (!this.token) {
+        this.token = await this.getFCMToken();
+      }
+      
+      // Remove token from server
+      if (this.token) {
+        await this.removeTokenFromServer(this.token);
+      } else {
+        // Fallback: just call remove endpoint without specific token
+        await this.removeTokenFromServer('');
+      }
+      
+      this.token = null;
+    } catch (error) {
+      console.error('Error during unsubscribe:', error);
+      // Still try to remove from server even if token retrieval failed
+      await this.removeTokenFromServer('');
       this.token = null;
     }
   }

@@ -43,6 +43,13 @@ const YouTubeConnection = () => {
       // Clear the URL parameter and recheck connection
       window.history.replaceState({}, document.title, window.location.pathname);
       setTimeout(() => checkConnectionStatus(), 1000);
+    } else if (urlParams.get('youtube') === 'error') {
+      // Handle OAuth error
+      const errorMessage = urlParams.get('message') || 'YouTube connection failed';
+      setError(errorMessage);
+      setConnecting(false);
+      // Clear the URL parameter
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 

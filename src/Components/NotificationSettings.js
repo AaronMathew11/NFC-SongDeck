@@ -4,6 +4,7 @@ import notificationService from '../services/notificationService';
 
 const NotificationSettings = () => {
   const [permissionStatus, setPermissionStatus] = useState('default');
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isSupported, setIsSupported] = useState(true);
@@ -18,6 +19,10 @@ const NotificationSettings = () => {
     if (notificationService.isSupported) {
       const status = await notificationService.getPermissionStatus();
       setPermissionStatus(status);
+      
+      // Check if user is actually subscribed (has valid token on server)
+      const subscribed = await notificationService.isUserSubscribed();
+      setIsSubscribed(subscribed);
     }
   };
 
@@ -26,13 +31,15 @@ const NotificationSettings = () => {
     setMessage('');
 
     try {
-      if (permissionStatus === 'granted') {
+      if (isSubscribed) {
         await notificationService.unsubscribe();
-        setPermissionStatus('denied');
+        setIsSubscribed(false);
         setMessage('Notifications disabled');
       } else {
         await notificationService.subscribeToNotifications();
-        setPermissionStatus('granted');
+        const status = await notificationService.getPermissionStatus();
+        setPermissionStatus(status);
+        setIsSubscribed(true);
         setMessage('Notifications enabled');
       }
     } catch (error) {
@@ -64,7 +71,7 @@ const NotificationSettings = () => {
     );
   }
 
-  const isEnabled = permissionStatus === 'granted';
+  const isEnabled = isSubscribed && permissionStatus === 'granted';
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
