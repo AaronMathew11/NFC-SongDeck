@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getConfig } from '../config/production';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://api-m2ugc4x7ma-uc.a.run.app/api';
+const API_BASE_URL = getConfig('API_BASE_URL');
 
 // Create axios instance with default config
 const api = axios.create({

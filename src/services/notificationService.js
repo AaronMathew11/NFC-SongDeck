@@ -1,8 +1,9 @@
 import { messaging, getToken, onMessage, isSupported } from '../firebase/config';
+import { getConfig } from '../config/production';
 
 class NotificationService {
   constructor() {
-    this.vapidKey = process.env.REACT_APP_VAPID_KEY;
+    this.vapidKey = getConfig('VAPID_KEY');
     this.token = null;
     this.isSupported = this.checkSupport();
     
@@ -140,7 +141,7 @@ class NotificationService {
 
   async sendTokenToServer(token) {
     try {
-      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/saveNotificationToken', {
+      const response = await fetch(`${getConfig('API_BASE_URL')}/saveNotificationToken`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +189,7 @@ class NotificationService {
 
   async isUserSubscribed() {
     try {
-      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/me', {
+      const response = await fetch(`${getConfig('API_BASE_URL')}/me`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -231,7 +232,7 @@ class NotificationService {
 
   async removeTokenFromServer(token) {
     try {
-      await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/removeNotificationToken', {
+      await fetch(`${getConfig('API_BASE_URL')}/removeNotificationToken`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

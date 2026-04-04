@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://api-m2ugc4x7ma-uc.a.run.app/api';
+import { getConfig } from '../config/production';
+
+const API_BASE_URL = getConfig('API_BASE_URL');
 
 // Create axios instance with auth
 const api = axios.create({
