@@ -5,6 +5,7 @@ import { draftService } from '../utils/draftService';
 
 const DraftsPage = ({ loadDraftToList }) => {
   const [drafts, setDrafts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,6 +37,8 @@ const DraftsPage = ({ loadDraftToList }) => {
       console.log('Falling back to show all drafts');
       // Fallback to showing all drafts if API call fails
       setDrafts(savedDrafts);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,7 +72,14 @@ const DraftsPage = ({ loadDraftToList }) => {
       <div className="max-w-md mx-auto px-4">
         {/* Drafts Content */}
         <div className="mt-6 space-y-3">
-          {drafts.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8 animate-fade-in">
+              <div className="bg-white rounded-2xl p-6 shadow-card">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-4"></div>
+                <p className="text-gray-500 text-xs">Loading your drafts...</p>
+              </div>
+            </div>
+          ) : drafts.length === 0 ? (
             <div className="text-center py-8 animate-fade-in">
               <div className="bg-white rounded-2xl p-6 shadow-card">
                 <FaMusic className="text-3xl text-gray-400 mx-auto mb-3" />

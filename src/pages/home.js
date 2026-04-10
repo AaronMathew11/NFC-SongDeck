@@ -14,6 +14,7 @@ const Home = () => {
   const [showVerseEdit, setShowVerseEdit] = useState(false);
   const [newVerse, setNewVerse] = useState("");
   const [sharedResources, setSharedResources] = useState([]);
+  const [verseLoading, setVerseLoading] = useState(true);
   
   const getCurrentDate = () => {
     return moment().format('DD MMM');
@@ -47,6 +48,8 @@ const Home = () => {
         author: "Admin", 
         date: moment().format('MMM DD, YYYY')
       });
+    } finally {
+      setVerseLoading(false);
     }
   };
 
@@ -244,20 +247,22 @@ const Home = () => {
 
 
           {/* Shared Resources Section */}
-          {sharedResources.length > 0 && (
-            <div 
-              className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
-              onClick={() => navigate("/shared-resources")}
-            >
-              <div className="flex items-center">
-                <FaFolder className="text-2xl text-gray-700 mr-6 ml-3" />
-                <div className="text-left py-2">
-                  <h4 className="text-gray-900 font-bold text-sm mb-1">Shared Resources</h4>
-                  <p className="text-gray-600 text-xs">Access files and documents ({sharedResources.length} items)</p>
-                </div>
+          <div 
+            className="bg-gray-200 rounded-2xl p-4 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => navigate("/shared-resources")}
+          >
+            <div className="flex items-center">
+              <FaFolder className="text-2xl text-gray-700 mr-6 ml-3" />
+              <div className="text-left py-2">
+                <h4 className="text-gray-900 font-bold text-sm mb-1">Shared Resources</h4>
+                <p className="text-gray-600 text-xs">
+                  {sharedResources.length > 0 
+                    ? `Access files and documents (${sharedResources.length} items)`
+                    : "Access shared files and documents"}
+                </p>
               </div>
             </div>
-          )}
+          </div>
           
           {/* This Week's Songs Card */}
           <div 
@@ -293,15 +298,24 @@ const Home = () => {
             </div>
             
             {!showVerseEdit ? (
-              <div>
-                <p className="text-gray-800 text-sm italic leading-relaxed mb-3">
-                  "{currentVerse.text}"
-                </p>
-                <div className="flex justify-between items-center text-xs text-gray-500">
-                  <span>— {currentVerse.author}</span>
-                  <span>{currentVerse.date}</span>
+              verseLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-3"></div>
+                    <p className="text-gray-500 text-xs">Loading community verse...</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <p className="text-gray-800 text-sm italic leading-relaxed mb-3">
+                    "{currentVerse.text}"
+                  </p>
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>— {currentVerse.author}</span>
+                    <span>{currentVerse.date}</span>
+                  </div>
+                </div>
+              )
             ) : (
               <div className="space-y-3">
                 <textarea
