@@ -52,13 +52,31 @@ const Home = () => {
 
   const loadSharedResources = async () => {
     try {
-      // For now, load from localStorage, later replace with API call
+      const response = await fetch('https://api-m2ugc4x7ma-uc.a.run.app/api/resources', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || 'test'}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSharedResources(data.resources || []);
+      } else {
+        console.error('Failed to load resources:', response.statusText);
+        // Fallback to localStorage
+        const saved = localStorage.getItem('sharedResources');
+        if (saved) {
+          setSharedResources(JSON.parse(saved));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading shared resources:', error);
+      // Fallback to localStorage
       const saved = localStorage.getItem('sharedResources');
       if (saved) {
         setSharedResources(JSON.parse(saved));
       }
-    } catch (error) {
-      console.error('Error loading shared resources:', error);
     }
   };
 
