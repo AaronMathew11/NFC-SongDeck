@@ -5,6 +5,7 @@ const SharedResources = () => {
   const [resources, setResources] = useState([]);
   const [selectedPdf, setSelectedPdf] = useState(null);
   const [showPdfViewer, setShowPdfViewer] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadResources();
@@ -24,9 +25,13 @@ const SharedResources = () => {
         setResources(data.resources || []);
       } else {
         console.error('Failed to load resources:', response.statusText);
+        setResources([]);
       }
     } catch (error) {
       console.error('Error loading resources:', error);
+      setResources([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,7 +102,14 @@ const SharedResources = () => {
       <div className="max-w-md mx-auto px-4">
         {/* Resources List */}
         <div className="mt-6 space-y-3">
-          {resources.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8 animate-fade-in">
+              <div className="bg-white rounded-2xl p-6 shadow-card">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-4"></div>
+                <p className="text-gray-500 text-xs">Loading shared resources...</p>
+              </div>
+            </div>
+          ) : resources.length === 0 ? (
             <div className="text-center py-8 animate-fade-in">
               <div className="bg-white rounded-2xl p-6 shadow-card">
                 <FaFolder className="text-3xl text-gray-400 mx-auto mb-3" />

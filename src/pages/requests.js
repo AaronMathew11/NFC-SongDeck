@@ -6,6 +6,7 @@ const RequestsPage = () => {
   const [publishRequests, setPublishRequests] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadPublishRequests();
@@ -19,6 +20,8 @@ const RequestsPage = () => {
     } catch (error) {
       console.error('Error loading publish requests for display:', error);
       setPublishRequests([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,7 +93,14 @@ const RequestsPage = () => {
       <div className="max-w-md mx-auto px-4">
         {/* Publish Requests Content */}
         <div className="mt-6 space-y-3">
-          {publishRequests.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-8 animate-fade-in">
+              <div className="bg-white rounded-2xl p-6 shadow-card">
+                <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-4"></div>
+                <p className="text-gray-500 text-xs">Loading your requests...</p>
+              </div>
+            </div>
+          ) : publishRequests.length === 0 ? (
             <div className="text-center py-8 animate-fade-in">
               <div className="bg-white rounded-2xl p-6 shadow-card">
                 <FaPaperPlane className="text-3xl text-gray-400 mx-auto mb-3" />

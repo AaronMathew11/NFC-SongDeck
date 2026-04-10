@@ -10,7 +10,12 @@ const QuietTime = () => {
   const [mentees, setMentees] = useState([]);
   const [selectedMentee, setSelectedMentee] = useState(null);
   const [stats, setStats] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loadingStates, setLoadingStates] = useState({
+    notes: true,
+    mentees: true,
+    stats: true,
+    menteeNotes: false
+  });
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('upload');
   const [selectedImage, setSelectedImage] = useState(null);
@@ -21,51 +26,67 @@ const QuietTime = () => {
   const [imageErrors, setImageErrors] = useState({});
 
   const fetchData = useCallback(async () => {
-    try {
-      const headers = { Authorization: `Bearer ${token}` };
-      const timeout = 10000; // 10 second timeout
-      
-      const [notesRes, menteesRes, statsRes] = await Promise.all([
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMyNotes', { headers, timeout }),
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMentees', { headers, timeout }),
-        axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getStats', { headers, timeout })
-      ]);
-      
-      setMyNotes(notesRes.data);
-      setMentees(menteesRes.data);
-      setStats(statsRes.data);
-      
-      if (user) {
-        updateUser({
-          ...user,
-          currentStreak: statsRes.data.currentStreak,
-          longestStreak: statsRes.data.longestStreak,
-          totalQuietTimes: statsRes.data.totalQuietTimes
-        });
+    if (!token) return;
+    
+    const headers = { Authorization: `Bearer ${token}` };
+    const timeout = 10000; // 10 second timeout
+
+    // Fetch notes
+    const fetchNotes = async () => {
+      try {
+        const response = await axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMyNotes', { headers, timeout });
+        setMyNotes(response.data);
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+        setMyNotes([]);
+      } finally {
+        setLoadingStates(prev => ({ ...prev, notes: false }));
       }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      
-      // Only set empty arrays for notes and mentees to prevent rendering errors
-      // Keep existing stats values to prevent analytics from resetting to 0
-      setMyNotes([]);
-      setMentees([]);
-      
-      // If it's an auth error, the user might need to log in again
-      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-        console.log('Authentication error - user may need to log in again');
-        // Only reset stats on auth errors
-        setStats({
-          currentStreak: 0,
-          longestStreak: 0,
-          totalQuietTimes: 0
-        });
-      } else if (error.code === 'ECONNABORTED') {
-        console.log('Request timeout - please try again');
+    };
+
+    // Fetch mentees
+    const fetchMentees = async () => {
+      try {
+        const response = await axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getMentees', { headers, timeout });
+        setMentees(response.data);
+      } catch (error) {
+        console.error('Error fetching mentees:', error);
+        setMentees([]);
+      } finally {
+        setLoadingStates(prev => ({ ...prev, mentees: false }));
       }
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    // Fetch stats
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('https://api-m2ugc4x7ma-uc.a.run.app/api/getStats', { headers, timeout });
+        setStats(response.data);
+        
+        if (user) {
+          updateUser({
+            ...user,
+            currentStreak: response.data.currentStreak,
+            longestStreak: response.data.longestStreak,
+            totalQuietTimes: response.data.totalQuietTimes
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          setStats({
+            currentStreak: 0,
+            longestStreak: 0,
+            totalQuietTimes: 0
+          });
+        }
+      } finally {
+        setLoadingStates(prev => ({ ...prev, stats: false }));
+      }
+    };
+
+    // Execute all requests in parallel
+    Promise.all([fetchNotes(), fetchMentees(), fetchStats()]);
   }, [token, user, updateUser]);
 
   useEffect(() => {
@@ -139,6 +160,7 @@ const QuietTime = () => {
   };
 
   const fetchMenteeNotes = async (menteeId) => {
+    setLoadingStates(prev => ({ ...prev, menteeNotes: true }));
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const response = await axios.get(`https://api-m2ugc4x7ma-uc.a.run.app/api/getMenteeNotes/${menteeId}`, { headers });
@@ -146,6 +168,9 @@ const QuietTime = () => {
       setSelectedMentee(mentees.find(m => m._id === menteeId));
     } catch (error) {
       console.error('Error fetching mentee notes:', error);
+      setMenteeNotes([]);
+    } finally {
+      setLoadingStates(prev => ({ ...prev, menteeNotes: false }));
     }
   };
 
@@ -273,16 +298,15 @@ const QuietTime = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page-container min-h-screen flex items-center justify-center">
-        <div className="content-card text-center">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-4"></div>
-          <p className="text-gray-500 text-sm">Loading quiet time data...</p>
-        </div>
+  // Component-level loading spinner
+  const LoadingSpinner = ({ text }) => (
+    <div className="flex items-center justify-center py-8">
+      <div className="text-center">
+        <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-3"></div>
+        <p className="text-gray-500 text-sm">{text}</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <>
@@ -332,17 +356,29 @@ const QuietTime = () => {
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white rounded-2xl p-4 text-center shadow-card">
               <FaFire className="text-accent-orange text-2xl mx-auto mb-2" />
-              <div className="text-xl font-bold text-gray-900">{stats.currentStreak || 0}</div>
+              {loadingStates.stats ? (
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-2"></div>
+              ) : (
+                <div className="text-xl font-bold text-gray-900">{stats.currentStreak || 0}</div>
+              )}
               <div className="text-xs text-gray-500">Current Streak</div>
             </div>
             <div className="bg-white rounded-2xl p-4 text-center shadow-card">
               <FaTrophy className="text-accent-yellow text-2xl mx-auto mb-2" />
-              <div className="text-xl font-bold text-gray-900">{stats.longestStreak || 0}</div>
+              {loadingStates.stats ? (
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-2"></div>
+              ) : (
+                <div className="text-xl font-bold text-gray-900">{stats.longestStreak || 0}</div>
+              )}
               <div className="text-xs text-gray-500">Best Streak</div>
             </div>
             <div className="bg-white rounded-2xl p-4 text-center shadow-card">
               <FaCalendar className="text-accent-blue text-2xl mx-auto mb-2" />
-              <div className="text-xl font-bold text-gray-900">{stats.totalQuietTimes || 0}</div>
+              {loadingStates.stats ? (
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-900 rounded-full mx-auto animate-spin mb-2"></div>
+              ) : (
+                <div className="text-xl font-bold text-gray-900">{stats.totalQuietTimes || 0}</div>
+              )}
               <div className="text-xs text-gray-500">Total Days</div>
             </div>
           </div>
@@ -367,17 +403,15 @@ const QuietTime = () => {
               >
                 My Notes
               </button>
-              {mentees.length > 0 && (
-                <button
-                  onClick={() => setActiveTab('mentee-notes')}
-                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    activeTab === 'mentee-notes' ? 'bg-gray-900 text-white shadow-card' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <FaUsers className="inline mr-1" />
-                  Mentees
-                </button>
-              )}
+              <button
+                onClick={() => setActiveTab('mentee-notes')}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  activeTab === 'mentee-notes' ? 'bg-gray-900 text-white shadow-card' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <FaUsers className="inline mr-1" />
+                Mentees
+              </button>
             </div>
           </div>
 
@@ -467,7 +501,11 @@ const QuietTime = () => {
 
           {activeTab === 'my-notes' && (
             <div className="space-y-4 animate-fade-in">
-              {(() => {
+              {loadingStates.notes ? (
+                <div className="content-card">
+                  <LoadingSpinner text="Loading your notes..." />
+                </div>
+              ) : (() => {
                 const availableNotes = filterAvailableNotes(myNotes);
                 return availableNotes.length === 0 ? (
                   <div className="content-card text-center">
@@ -530,10 +568,19 @@ const QuietTime = () => {
                       <FaChartLine className="text-gray-600" />
                     </button>
                   </div>
-                  <div className="space-y-3">
-                    {mentees
-                      .sort((a, b) => new Date(b.lastQuietTime || 0) - new Date(a.lastQuietTime || 0))
-                      .map((mentee, index) => (
+                  {loadingStates.mentees ? (
+                    <LoadingSpinner text="Loading mentees..." />
+                  ) : mentees.length === 0 ? (
+                    <div className="text-center py-8">
+                      <FaUsers className="text-4xl text-gray-400 mx-auto mb-4" />
+                      <h4 className="font-bold text-gray-900 mb-2">No mentees yet</h4>
+                      <p className="text-gray-500 text-sm">You haven't been assigned any mentees yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {mentees
+                        .sort((a, b) => new Date(b.lastQuietTime || 0) - new Date(a.lastQuietTime || 0))
+                        .map((mentee, index) => (
                       <div
                         key={mentee._id}
                         onClick={() => fetchMenteeNotes(mentee._id)}
@@ -560,8 +607,9 @@ const QuietTime = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -587,7 +635,11 @@ const QuietTime = () => {
                     </div>
                   </div>
                   
-                  {(() => {
+                  {loadingStates.menteeNotes ? (
+                    <div className="content-card">
+                      <LoadingSpinner text={`Loading ${selectedMentee.name}'s notes...`} />
+                    </div>
+                  ) : (() => {
                     const availableNotes = filterAvailableNotes(menteeNotes);
                     return availableNotes.length === 0 ? (
                       <div className="content-card text-center">
@@ -642,7 +694,7 @@ const QuietTime = () => {
                       </div>
                       ))
                     );
-                  })()}
+                  })()}}
                 </div>
               )}
             </div>
@@ -661,7 +713,9 @@ const QuietTime = () => {
                   </div>
                 </div>
 
-                {mentees.length === 0 ? (
+                {loadingStates.mentees ? (
+                  <LoadingSpinner text="Loading mentee analytics..." />
+                ) : mentees.length === 0 ? (
                   <div className="text-center py-8">
                     <FaUsers className="text-4xl text-gray-400 mx-auto mb-4" />
                     <h4 className="font-bold text-gray-900 mb-2">No mentees yet</h4>
